@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a1020">
+<title>Taksi Durağı</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect rx='12' width='64' height='64' fill='%23ffc400'/><text x='32' y='44' text-anchor='middle' font-size='36'>🚕</text></svg>">
+<style>
+:root {
+  --navy:#0a1020; --navy-1:#0e1628; --navy-2:#141c32; --navy-3:#1c2744; --navy-4:#263556;
+  --line:rgba(255,196,0,.18); --yellow:#ffc400; --yellow-2:#ffd54a; --yellow-d:#c49200;
+  --text:#f3efe4; --muted:#9aa3b8; --dim:#6d7690; --green:#3ddc84; --red:#ff5c6a;
+  --blue:#5ab0ff; --orange:#ff9a3c; --purple:#b59bff;
+  --shadow:0 8px 24px rgba(0,0,0,.4); --radius:14px;
+  --top:42px; --banner:26px; --nav:58px;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden;background:#070b14;color:var(--text);
+  font-family:"Noto Sans","DejaVu Sans","Segoe UI","Roboto","Helvetica Neue",Arial,sans-serif;user-select:none;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select{font:inherit;color:inherit}
+.hidden{display:none!important}
+#app{position:relative;width:100%;height:100%;max-width:1200px;margin:0 auto;background:var(--navy);overflow:hidden}
+
+/* START */
+#screen-start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 20%,#1e2a4a 0%,#0a1020 55%,#070b14 100%);z-index:20;overflow:hidden}
+.start-art{position:absolute;left:0;right:0;bottom:0;height:46%;pointer-events:none}
+.start-road{position:absolute;bottom:0;left:0;right:0;height:58px;background:#151b28;border-top:3px solid #2a3144;overflow:hidden}
+.start-road::after{content:"";position:absolute;top:26px;left:-20%;right:-20%;height:4px;
+  background:repeating-linear-gradient(90deg,var(--yellow) 0 28px,transparent 28px 52px);animation:dashes 1.4s linear infinite}
+@keyframes dashes{to{transform:translateX(-52px)}}
+.start-hero{position:relative;z-index:2;text-align:center;margin-top:-8vh;padding:0 20px}
+.logo-light{width:54px;height:22px;margin:0 auto 8px;background:var(--yellow);border-radius:4px 4px 2px 2px;
+  box-shadow:0 0 18px var(--yellow),0 0 40px rgba(255,196,0,.4);animation:blink 2.4s ease-in-out infinite;position:relative}
+.logo-light::before,.logo-light::after{content:"";position:absolute;top:4px;width:10px;height:10px;background:#1a1400;border-radius:1px}
+.logo-light::before{left:8px}.logo-light::after{right:8px}
+@keyframes blink{0%,70%,100%{filter:brightness(1)}80%{filter:brightness(.45)}}
+.start-hero h1{font-size:clamp(28px,6vw,46px);letter-spacing:.18em;font-weight:800;color:var(--yellow);
+  text-shadow:0 2px 0 var(--yellow-d),0 8px 24px rgba(255,196,0,.25)}
+.start-hero h1 span{display:block;letter-spacing:.42em;font-size:.42em;color:var(--text);font-weight:600;margin-top:2px;opacity:.9}
+.start-hero p.tag{color:var(--muted);margin:8px 0 18px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.start-card{background:rgba(20,28,50,.86);border:1px solid var(--line);border-radius:18px;padding:16px 18px 18px;
+  width:min(360px,86vw);box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+.start-card label{display:block;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;text-align:left}
+.start-card input{width:100%;background:#0c1322;border:1px solid var(--navy-4);border-radius:10px;padding:10px 12px;outline:none;font-size:16px;margin-bottom:12px}
+.start-card input:focus{border-color:var(--yellow)}
+.start-actions{display:flex;flex-direction:column;gap:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;
+  border-radius:12px;font-weight:700;letter-spacing:.02em;transition:transform .12s,filter .12s,background .15s}
+.btn:active{transform:scale(.97)}.btn:disabled{opacity:.45;pointer-events:none}
+.btn-y{background:linear-gradient(180deg,var(--yellow-2),var(--yellow));color:#1a1400;box-shadow:0 4px 0 var(--yellow-d),0 6px 16px rgba(255,196,0,.28)}
+.btn-y:active{box-shadow:0 1px 0 var(--yellow-d)}
+.btn-g{background:var(--navy-3);color:var(--text);border:1px solid var(--line)}
+.btn-d{background:#3a1d28;color:#ffb3bc;border:1px solid rgba(255,92,106,.35)}
+.btn-ok{background:linear-gradient(180deg,#55e996,var(--green));color:#062416}
+.btn-sm{min-height:36px;padding:0 10px;font-size:12px;border-radius:9px}
+.btn-xs{min-height:30px;padding:0 8px;font-size:11px;border-radius:8px}
+.btn-block{width:100%}
+
+/* SHELL */
+#screen-game{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--navy)}
+#topbar{height:calc(var(--top) + var(--safe-t));padding:var(--safe-t) 10px 0 10px;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,#12182c,#0e1526);border-bottom:1px solid var(--line);flex-shrink:0;z-index:8}
+.tb-player{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(180deg,var(--yellow),#c49200);
+  display:grid;place-items:center;font-size:16px;box-shadow:0 0 0 2px rgba(255,196,0,.25);flex-shrink:0}
+.tb-meta{min-width:0}
+.tb-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-level{font-size:10px;color:var(--yellow);display:flex;align-items:center;gap:6px}
+.xp-bar{width:64px;height:5px;background:#2a3458;border-radius:4px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.xp-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),#fff3b0);border-radius:4px}
+.tb-cash{background:#121a14;border:1px solid rgba(61,220,132,.3);color:var(--green);font-weight:800;font-size:13px;
+  padding:5px 10px;border-radius:999px;white-space:nowrap;letter-spacing:.02em;position:relative}
+.tb-cash.neg{background:#2a1216;border-color:rgba(255,92,106,.4);color:var(--red)}
+.tb-time{text-align:right;font-variant-numeric:tabular-nums}
+.tb-time .day{font-size:10px;color:var(--muted)}
+.tb-time .clock{font-size:14px;font-weight:700;letter-spacing:.04em}
+.icon-btn{width:34px;height:34px;border-radius:10px;background:var(--navy-3);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:15px;flex-shrink:0}
+#event-banner{height:var(--banner);flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:11px;font-weight:600;letter-spacing:.03em;background:linear-gradient(90deg,#3a2a00,#5a4300,#3a2a00);
+  color:var(--yellow-2);border-bottom:1px solid rgba(255,196,0,.2);overflow:hidden;white-space:nowrap}
+#event-banner .dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);box-shadow:0 0 8px var(--yellow);animation:blink 1.6s infinite}
+#view{flex:1;min-height:0;position:relative;overflow:hidden;animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#bottomnav{height:calc(var(--nav) + var(--safe-b));padding:0 4px var(--safe-b);display:flex;align-items:stretch;justify-content:space-around;
+  background:#0c1220;border-top:1px solid var(--line);flex-shrink:0;z-index:8}
+#bottomnav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  color:var(--dim);font-size:9px;font-weight:600;letter-spacing:.02em;min-width:0}
+#bottomnav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#bottomnav button.on{color:var(--yellow)}
+#bottomnav button.on svg{fill:rgba(255,196,0,.15)}
+
+/* SHARED */
+.view-pad{height:100%;overflow:auto;padding:8px 10px 10px;-webkit-overflow-scrolling:touch}
+.row{display:flex;align-items:center;gap:8px}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.col{display:flex;flex-direction:column;gap:8px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--navy-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px}
+.card h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--yellow);margin-bottom:6px}
+.muted{color:var(--muted);font-size:12px}.dim{color:var(--dim);font-size:11px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.04em}
+.pill-y{background:rgba(255,196,0,.15);color:var(--yellow)}
+.pill-g{background:rgba(61,220,132,.15);color:var(--green)}
+.pill-r{background:rgba(255,92,106,.15);color:var(--red)}
+.pill-b{background:rgba(90,176,255,.15);color:var(--blue)}
+.pill-o{background:rgba(255,154,60,.15);color:var(--orange)}
+.pill-p{background:rgba(181,155,255,.15);color:var(--purple)}
+.bar{height:7px;background:#1a2238;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--green)}
+.bar.warn i{background:var(--orange)}.bar.bad i{background:var(--red)}
+.tabs{display:flex;gap:4px;background:#0c1322;padding:3px;border-radius:10px;margin-bottom:8px}
+.tabs button{flex:1;min-height:32px;border-radius:8px;font-size:12px;font-weight:700;color:#c5cde0}
+.tabs button.on{background:var(--navy-3);color:var(--yellow);box-shadow:inset 0 0 0 1px var(--line)}
+.list{display:flex;flex-direction:column;gap:8px}
+.money{color:var(--green);font-weight:800}.money.out{color:var(--red)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{background:#0c1322;border-radius:10px;padding:8px;text-align:center}
+.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:var(--muted)}
+
+/* STREET */
+#view-durak{height:100%;display:grid;grid-template-rows:1fr auto}
+.street{position:relative;overflow:hidden;background:#1a2740}
+.sky{position:absolute;inset:0 0 34% 0;transition:background 1.2s}
+.sky.dawn{background:linear-gradient(#f3a26a,#7ea0c8 55%,#c9d6e8)}
+.sky.day{background:linear-gradient(#5aa0e0,#9ec8f0 60%,#cfe4f8)}
+.sky.dusk{background:linear-gradient(#f08a4b,#c45d6a 40%,#4a3a6a 80%,#2a2a44)}
+.sky.night{background:linear-gradient(#070b18,#10182e 60%,#1a2240)}
+.celestial{position:absolute;width:28px;height:28px;border-radius:50%;right:14%;top:12%;box-shadow:0 0 24px currentColor}
+.sky.day .celestial,.sky.dawn .celestial{background:#ffe680;color:#ffe680}
+.sky.dusk .celestial{background:#ffd0a0;color:#ffb070;top:20%}
+.sky.night .celestial{background:#f0f3ff;color:#c8d4ff;box-shadow:0 0 16px #fff,-8px 4px 0 -2px #10182e}
+.stars{position:absolute;inset:0;opacity:0;transition:opacity 1s;pointer-events:none;
+  background-image:radial-gradient(1px 1px at 10% 20%,#fff 50%,transparent),radial-gradient(1px 1px at 30% 40%,#fff 50%,transparent),
+    radial-gradient(1.5px 1.5px at 70% 15%,#fff 50%,transparent),radial-gradient(1px 1px at 85% 35%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 50% 25%,#fff 50%,transparent),radial-gradient(1px 1px at 20% 60%,#fff 50%,transparent)}
+.sky.night .stars{opacity:.85}
+.cloud{position:absolute;background:rgba(255,255,255,.55);border-radius:40px;height:14px;animation:cloud 60s linear infinite}
+.sky.night .cloud{opacity:.15}
+@keyframes cloud{from{transform:translateX(-40px)}to{transform:translateX(120vw)}}
+.skyline-far{position:absolute;left:-10%;right:-10%;bottom:34%;height:38%;opacity:.55;animation:drift 50s linear infinite alternate}
+.skyline-mid{position:absolute;left:0;right:0;bottom:32%;height:46%}
+@keyframes drift{from{transform:translateX(-12px)}to{transform:translateX(16px)}}
+.bldg{position:absolute;bottom:0;background:linear-gradient(#2b3654,#1a2238);border-top:2px solid rgba(255,255,255,.06)}
+.bldg::after{content:"";position:absolute;inset:6px 5px;background:repeating-linear-gradient(to bottom,#d7c07a 0 4px,transparent 4px 11px);
+  background-size:8px 11px;opacity:.25}
+.sky.night .bldg::after,.sky.dusk .bldg::after{opacity:.85;background:repeating-linear-gradient(to right,#ffd978 0 5px,transparent 5px 11px),
+  repeating-linear-gradient(to bottom,#ffd978 0 4px,transparent 4px 11px);background-blend-mode:multiply}
+.mosque{position:absolute;bottom:0;z-index:2;pointer-events:none}
+.water{position:absolute;right:0;top:30%;width:22%;height:36%;background:linear-gradient(90deg,transparent,rgba(70,140,190,.4));
+  pointer-events:none;overflow:hidden}
+.sky.night .water{background:linear-gradient(90deg,transparent,rgba(30,70,110,.5))}
+.water i{position:absolute;left:0;right:0;height:2px;background:rgba(200,230,255,.25);animation:wave 4s linear infinite}
+@keyframes wave{from{transform:translateY(0);opacity:.2}to{transform:translateY(30px);opacity:0}}
+.street-road{position:absolute;left:0;right:0;bottom:0;height:30%;background:#1c2333;border-top:4px solid #323a4e;overflow:hidden}
+.street-road .lane{position:absolute;top:46%;left:0;right:0;height:3px;
+  background:repeating-linear-gradient(90deg,#c8b24a 0 18px,transparent 18px 34px);animation:lanemove 1s linear infinite}
+@keyframes lanemove{to{transform:translateX(-34px)}}
+.sidewalk{position:absolute;left:0;right:0;bottom:30%;height:6%;background:#2a3144;border-top:2px solid #3c4560}
+.stand-pole{position:absolute;bottom:32%;left:8%;width:6px;height:42%;background:#1a1a1a;z-index:3}
+.stand-sign{position:absolute;bottom:66%;left:4%;width:72px;z-index:4;background:var(--yellow);color:#1a1400;
+  font-weight:900;font-size:11px;letter-spacing:.08em;text-align:center;padding:5px 4px 4px;border-radius:3px;
+  box-shadow:0 4px 0 #a87e00,0 0 16px rgba(255,196,0,.35);line-height:1.15}
+.stand-sign small{display:block;font-size:8px;letter-spacing:.16em}
+.lamp{position:absolute;bottom:32%;width:5px;height:36%;background:#1c1c22;z-index:3}
+.lamp::after{content:"";position:absolute;top:-6px;left:-8px;width:22px;height:10px;background:#2a2a30;border-radius:4px 4px 8px 8px}
+.lamp .glow{position:absolute;top:0;left:50%;width:90px;height:90px;transform:translateX(-50%);
+  background:radial-gradient(ellipse at top,rgba(255,210,100,.4),transparent 70%);opacity:0;pointer-events:none;transition:opacity .8s}
+.sky.night .lamp .glow,.sky.dusk .lamp .glow{opacity:1}
+.taxi-park{position:absolute;bottom:4%;left:16%;z-index:5}
+.pax-wait{position:absolute;bottom:32%;z-index:4;display:flex;gap:4px;align-items:flex-end}
+.tree{position:absolute;bottom:32%;z-index:2;width:8px;height:22%;background:#3a2a18}
+.tree::after{content:"";position:absolute;left:50%;bottom:60%;width:36px;height:36px;border-radius:50%;background:#2d5a38;transform:translateX(-50%)}
+.sky.night .tree::after{background:#1a3520}
+.traffic{position:absolute;bottom:6%;z-index:4;animation:pass 9s linear infinite}
+.traffic.b{animation-duration:13s;animation-delay:-4s;bottom:14%;transform:scale(.75);opacity:.85}
+@keyframes pass{from{left:110%}to{left:-25%}}
+.stand-chip{position:absolute;top:8px;right:8px;z-index:6;background:rgba(10,16,32,.78);border:1px solid var(--line);
+  border-radius:999px;padding:4px 10px;font-size:11px;font-weight:700;backdrop-filter:blur(6px)}
+.durak-dock{display:grid;grid-template-columns:1.15fr 1fr auto;gap:8px;padding:8px 10px;background:linear-gradient(180deg,#12182c,#0c1220);
+  border-top:1px solid var(--line);align-items:stretch}
+.quest-card,.daily-card{background:var(--navy-2);border:1px solid var(--line);border-radius:12px;padding:7px 9px;min-width:0}
+.q-kicker{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--yellow);font-weight:700}
+.q-title{font-size:12px;font-weight:700;margin-top:2px}
+.q-prog{font-size:10px;color:var(--muted);margin-top:2px}
+.daily-item{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;font-weight:600;margin-top:3px}
+.daily-item.done{color:var(--green);text-decoration:line-through}
+.yolcu-btn{min-width:132px;min-height:64px;flex-direction:column;gap:2px;border-radius:14px;font-size:15px}
+.yolcu-btn small{font-size:11px;font-weight:700;opacity:.8}
+
+/* RIDE */
+#ride{position:absolute;inset:0;z-index:15;display:flex;flex-direction:column;background:#0b101c}
+#ride.hidden{display:none!important}
+.interior{flex:1;min-height:0;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.windshield{position:relative;flex:1;min-height:80px;margin:0 18px 0;background:#2a4060;border-radius:0 0 40% 40%/0 0 14% 14%;
+  overflow:hidden;box-shadow:inset 0 -20px 30px rgba(0,0,0,.25),0 0 0 6px #1a1520}
+.ws-sky{position:absolute;inset:0 0 36% 0}
+.ws-city{position:absolute;left:-20%;right:-20%;bottom:36%;height:36%;animation:none}
+.ws-city.run{animation:scenery 3s linear infinite}
+@keyframes scenery{to{transform:translateX(-40px)}}
+.ws-road{position:absolute;left:0;right:0;bottom:0;height:42%;background:#2a3140;clip-path:polygon(22% 0,78% 0,100% 100%,0 100%)}
+.ws-lane{position:absolute;left:50%;top:0;width:6px;height:100%;background:repeating-linear-gradient(180deg,#d8c25a 0 12px,transparent 12px 26px);
+  transform:translateX(-50%)}
+.ws-lane.run{animation:lanerun .35s linear infinite}
+@keyframes lanerun{to{transform:translateX(-50%) translateY(26px)}}
+.mirror{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:86px;height:36px;background:#111;border:3px solid #2a2a30;
+  border-radius:8px;overflow:hidden;z-index:5;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.mirror small{position:absolute;bottom:1px;left:0;right:0;text-align:center;font-size:6px;color:#888;letter-spacing:.08em}
+.dash{position:relative;flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:6px 14px 8px;background:linear-gradient(#2a2030,#121018);border-top:8px solid #3a2a22}
+.wheel-shape{position:relative;width:52px;height:52px;flex-shrink:0;border:6px solid #1a1a1a;border-radius:50%;
+  background:#2a2a2e;box-shadow:inset 0 0 0 8px #3a3a40,0 0 0 2px #111}
+.wheel-shape::after{content:"";position:absolute;inset:12px;border-radius:50%;background:#161616}
+.meter{position:relative;width:110px;height:42px;flex-shrink:0;background:#0a0c08;border:2px solid #3a3a20;border-radius:6px;
+  color:#7CFF6B;font-family:"Courier New","Noto Sans",monospace;font-weight:700;font-size:13px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:.06em;
+  box-shadow:inset 0 0 12px #0410,0 0 8px rgba(124,255,107,.2)}
+.meter small{font-size:8px;color:#6a8a5a;letter-spacing:.14em}
+.mood{flex:1;min-width:70px}
+.mood label{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.pax-seat{position:relative;display:flex;align-items:center;gap:8px;text-align:left}
+.pax-ava{width:48px;height:48px;border-radius:50%;margin:0;background:#3a2a22;border:3px solid var(--yellow);
+  box-shadow:0 6px 16px rgba(0,0,0,.4);display:grid;place-items:center;overflow:hidden;flex-shrink:0}
+.pax-name{font-size:11px;font-weight:700;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:999px}
+.pax-type{display:block;font-size:9px;color:var(--yellow);font-weight:700;letter-spacing:.04em}
+.ride-ui{padding:8px 12px 10px;background:#0c1220;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.ride-prog-wrap{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.ride-prog{flex:1;height:10px;background:#1a2238;border-radius:8px;overflow:hidden}
+.ride-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--yellow),var(--green));border-radius:8px}
+.bubble{background:var(--navy-3);border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:8px 10px;font-size:13px}
+.choices{display:flex;flex-direction:column;gap:6px}
+.choices button,.choice-row button{text-align:left;background:var(--navy-2);border:1px solid var(--line);border-radius:10px;
+  padding:8px 12px;min-height:40px;font-size:13px;font-weight:600}
+.choices button:active,.choice-row button:active{border-color:var(--yellow);background:#243050}
+.choice-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.choice-row.three{grid-template-columns:1fr 1fr 1fr}
+.tap-game{background:#1a1520;border:1px solid var(--yellow);border-radius:12px;padding:8px 10px 10px}
+.tg-title{font-size:12px;font-weight:800;color:var(--yellow);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.tap-track{position:relative;height:22px;background:#0c0e16;border-radius:8px;overflow:hidden}
+.tap-track .zone{position:absolute;top:0;bottom:0;background:rgba(61,220,132,.45)}
+.tap-track .needle{position:absolute;top:0;bottom:0;width:3px;background:#fff;box-shadow:0 0 8px #fff}
+.stars-row{color:var(--yellow);letter-spacing:2px;font-size:18px}
+
+/* MAP / LISTS */
+.map-layout{height:100%;display:grid;grid-template-columns:1.4fr 1fr;gap:8px;padding:8px}
+.map-board{position:relative;background:#122033;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.bosphorus{position:absolute;top:0;bottom:0;left:44%;width:10%;background:linear-gradient(90deg,#1a3a52,#2a6a88,#1a3a52);opacity:.85}
+.bosphorus::before{content:"BOĞAZİÇİ";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);
+  font-size:9px;letter-spacing:.2em;color:rgba(200,230,255,.55);white-space:nowrap;font-weight:700}
+.bridge{position:absolute;left:42%;width:14%;height:5px;background:#c0c8d4;border-radius:2px;z-index:2;box-shadow:0 2px 0 #6a7380}
+.mdist{position:absolute;transform:translate(-50%,-50%);min-width:58px;text-align:center;padding:3px 6px 4px;
+  background:rgba(14,20,36,.92);border:1px solid rgba(255,196,0,.25);border-radius:8px;font-size:9px;font-weight:700;
+  cursor:pointer;line-height:1.15;z-index:3;white-space:nowrap}
+.mdist:active,.mdist.on{border-color:var(--yellow);background:#243250;box-shadow:0 0 0 2px rgba(255,196,0,.25)}
+.mdist.owned{border-color:var(--green)}
+.mdist .it{font-size:8px;color:var(--muted);font-weight:600}
+.map-info{overflow:auto;display:flex;flex-direction:column;gap:8px}
+.side-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+.car-row{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center}
+.car-thumb{height:58px;display:grid;place-items:center;background:#0c1322;border-radius:10px;overflow:hidden;position:relative}
+.lock-note{font-size:11px;color:var(--orange);font-weight:700}
+.kv{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:3px}
+.driver-ava{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+  background:var(--navy-3);border:2px solid var(--line);flex-shrink:0}
+
+/* MODAL / TOAST / FX */
+#modal{position:absolute;inset:0;z-index:40;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:16px}
+#modal .box{width:min(460px,94%);max-height:86%;overflow:auto;background:#141c32;border:1px solid var(--line);
+  border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+#modal h2{font-size:16px;margin-bottom:8px}
+#toast{position:absolute;left:50%;bottom:calc(var(--nav) + var(--safe-b) + 10px);transform:translateX(-50%) translateY(16px);
+  background:#1c2744;border:1px solid var(--yellow);color:var(--text);padding:8px 14px;border-radius:999px;
+  font-size:12px;font-weight:700;opacity:0;pointer-events:none;z-index:50;transition:.25s;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#orient{display:none;position:absolute;inset:0;z-index:80;background:#0a1020;color:var(--yellow);
+  align-items:center;justify-content:center;flex-direction:column;gap:10px;font-weight:800;letter-spacing:.08em;text-align:center;padding:20px}
+#orient span{font-size:40px}
+@media (orientation:portrait) and (max-width:700px){#orient{display:flex}}
+.result-line{display:flex;justify-content:space-between;padding:4px 0;font-size:14px}
+.result-line.total{border-top:1px solid var(--line);margin-top:6px;padding-top:8px;font-weight:800;font-size:16px}
+.coin-pop{position:absolute;right:120px;top:calc(var(--top) + var(--safe-t) - 4px);z-index:30;font-weight:800;font-size:13px;
+  color:var(--green);pointer-events:none;animation:coin 1s ease-out forwards;text-shadow:0 2px 6px rgba(0,0,0,.5)}
+.coin-pop.out{color:var(--red)}
+@keyframes coin{from{opacity:1;transform:translateY(8px)}to{opacity:0;transform:translateY(-22px)}}
+.chart{width:100%;height:70px;background:#0c1322;border-radius:10px;padding:6px}
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.badge{background:#0c1322;border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:10px;color:var(--dim)}
+.badge.on{border-color:var(--yellow);color:var(--yellow)}
+.badge .ic{font-size:20px;display:block;margin-bottom:4px}
+@media (min-width:900px){#app{border-left:1px solid var(--line);border-right:1px solid var(--line);box-shadow:0 0 80px rgba(0,0,0,.5)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="orient"><span>🔄</span>DAHA İYİ DENEYİM İÇİN<br>TELEFONU YATAY ÇEVİR</div>
+  <div id="screen-start">
+    <div class="start-art" id="start-art"></div>
+    <div class="start-road"></div>
+    <div class="start-hero">
+      <div class="logo-light"></div>
+      <h1>TAKSİ<span>DURAĞI</span></h1>
+      <p class="tag">İstanbul Filo Simülasyonu</p>
+      <div class="start-card">
+        <label for="pname">Şoför / Patron adı</label>
+        <input id="pname" maxlength="18" placeholder="Adınız" value="İzzet" autocomplete="off" spellcheck="false">
+        <div class="start-actions">
+          <button class="btn btn-y btn-block" id="btn-start" data-act="new-game">Oyuna Başla</button>
+          <button class="btn btn-g btn-block hidden" id="btn-continue" data-act="continue">Kaldığım yerden devam</button>
+          <button class="btn btn-d btn-block hidden" id="btn-wipe" data-act="wipe-from-start">Kayıtlı oyunu sil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="screen-game" class="hidden">
+    <header id="topbar">
+      <div class="tb-player">
+        <div class="avatar">🚕</div>
+        <div class="tb-meta">
+          <div class="tb-name" id="hud-name">İzzet</div>
+          <div class="tb-level"><span id="hud-level">Çaylak</span><span class="xp-bar"><i id="hud-xp" style="width:0%"></i></span></div>
+        </div>
+      </div>
+      <div class="tb-cash" id="hud-cash">50.000 TL</div>
+      <div class="tb-time">
+        <div class="day" id="hud-day">1. gün · 1. ay</div>
+        <div class="clock" id="hud-clock">08:00</div>
+      </div>
+      <button class="icon-btn" data-act="open-ach" title="Rozetler">🏅</button>
+      <button class="icon-btn" data-act="open-settings" title="Ayarlar">⚙</button>
+    </header>
+    <div id="event-banner"><span class="dot"></span><span id="hud-event">Sakin bir sabah</span></div>
+    <main id="view"></main>
+    <nav id="bottomnav"></nav>
+  </div>
+  <div id="ride" class="hidden"></div>
+  <div id="modal" class="hidden"></div>
+  <div id="toast"></div>
+  <div id="fx"></div>
+</div>
+<script>
+"use strict";
+const $ = (s,e=document)=>e.querySelector(s);
+const $$ = (s,e=document)=>[...e.querySelectorAll(s)];
+const SAVE_KEY = "taksiDuragi_v1";
+const MINUTES_PER_TICK = 2, TICK_MS = 250;
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function tl(n){const v=Math.round(Number(n)||0),sign=v<0?"-":"";return sign+Math.abs(v).toLocaleString("tr-TR")+" TL"}
+function pad2(n){return String(n).padStart(2,"0")}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function rand(a,b){return a+Math.random()*(b-a)}
+function irand(a,b){return Math.floor(rand(a,b+1))}
+function pick(arr){return arr[irand(0,arr.length-1)]}
+function uid(p="id"){return p+"_"+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4)}
+function chance(p){return Math.random()<p}
+
+const LEVELS=[
+  {level:1,name:"Çaylak",xp:0},{level:2,name:"Acemi",xp:80},{level:3,name:"Şoför",xp:200},
+  {level:4,name:"Kıdemli",xp:420},{level:5,name:"Usta",xp:750},{level:6,name:"Patron",xp:1200},
+  {level:7,name:"Filo Sahibi",xp:1850},{level:8,name:"Bölge Patronu",xp:2700},
+  {level:9,name:"Taksi Baronu",xp:3800},{level:10,name:"Taksi Kralı",xp:5200}
+];
+const CARS=[
+  {id:"klia",name:"Renol Klia",shape:"hatch",fuel:"LPG",comfort:2,price:185000,used:98000,rent:8500,level:1,color:"#ffc400",wear:1},
+  {id:"taliya",name:"Renol Taliya",shape:"hatch",fuel:"LPG",comfort:2,price:220000,used:118000,rent:9500,level:1,color:"#f0c030",wear:1},
+  {id:"ega",name:"Fiyat Ega",shape:"sedan",fuel:"LPG",comfort:3,price:280000,used:155000,rent:12000,level:1,color:"#e8b400",wear:.95},
+  {id:"akzent",name:"Hyundo Akzent",shape:"sedan",fuel:"LPG",comfort:3,price:265000,used:142000,rent:11000,level:2,color:"#ffd24a",wear:.95},
+  {id:"dobla",name:"Fiyat Dobla",shape:"van",fuel:"Dizel",comfort:3,price:325000,used:178000,rent:14000,level:3,color:"#f5c400",wear:.9},
+  {id:"kadi",name:"Folks Kadi",shape:"van",fuel:"Dizel",comfort:4,price:385000,used:215000,rent:16500,level:4,color:"#ffcc22",wear:.85},
+  {id:"joga",name:"Dacio Joga",shape:"mpv",fuel:"LPG",comfort:4,price:420000,used:240000,rent:18000,level:5,color:"#ffc000",wear:.85},
+  {id:"vita",name:"Mersedo Vita",shape:"premium",fuel:"Dizel",comfort:5,price:750000,used:425000,rent:32000,level:6,color:"#1a1a1a",wear:.7}
+];
+const DISTRICTS=[
+  {id:"esenyurt",name:"Esenyurt",side:"avrupa",x:9,y:38,standCost:20000,density:3,prestige:1,level:1},
+  {id:"avcilar",name:"Avcılar",side:"avrupa",x:10,y:54,standCost:24000,density:2,prestige:1,level:1},
+  {id:"basaksehir",name:"Başakşehir",side:"avrupa",x:14,y:24,standCost:48000,density:2,prestige:3,level:3},
+  {id:"bakirkoy",name:"Bakırköy",side:"avrupa",x:16,y:68,standCost:62000,density:3,prestige:4,level:3,hospital:true},
+  {id:"zeytinburnu",name:"Zeytinburnu",side:"avrupa",x:26,y:62,standCost:28000,density:3,prestige:2,level:1},
+  {id:"fatih",name:"Fatih",side:"avrupa",x:32,y:48,standCost:55000,density:4,prestige:3,level:2,hospital:true,mosque:true},
+  {id:"beyoglu",name:"Beyoğlu",side:"avrupa",x:37,y:36,standCost:100000,density:4,prestige:5,level:4},
+  {id:"sisli",name:"Şişli",side:"avrupa",x:24,y:32,standCost:90000,density:3,prestige:5,level:4,hospital:true},
+  {id:"besiktas",name:"Beşiktaş",side:"avrupa",x:36,y:20,standCost:110000,density:3,prestige:5,level:5},
+  {id:"sariyer",name:"Sarıyer",side:"avrupa",x:28,y:10,standCost:95000,density:2,prestige:4,level:5},
+  {id:"uskudar",name:"Üsküdar",side:"asya",x:61,y:28,standCost:45000,density:3,prestige:3,level:1,mosque:true,water:true},
+  {id:"kadikoy",name:"Kadıköy",side:"asya",x:63,y:46,standCost:80000,density:4,prestige:5,level:3,water:true},
+  {id:"atasehir",name:"Ataşehir",side:"asya",x:78,y:38,standCost:60000,density:3,prestige:4,level:3},
+  {id:"umraniye",name:"Ümraniye",side:"asya",x:78,y:18,standCost:38000,density:3,prestige:2,level:2},
+  {id:"maltepe",name:"Maltepe",side:"asya",x:76,y:58,standCost:40000,density:3,prestige:2,level:2,water:true},
+  {id:"kartal",name:"Kartal",side:"asya",x:86,y:68,standCost:42000,density:2,prestige:2,level:2},
+  {id:"pendik",name:"Pendik",side:"asya",x:93,y:74,standCost:36000,density:3,prestige:2,level:1}
+];
+const SPECIAL_DEST=[
+  {id:"ist",name:"İstanbul Havalimanı (İST)",side:"avrupa",x:20,y:4,airport:"IST"},
+  {id:"saw",name:"Sabiha Gökçen (SAW)",side:"asya",x:96,y:86,airport:"SAW"}
+];
+function allDest(){return DISTRICTS.concat(SPECIAL_DEST)}
+function destById(id){return allDest().find(d=>d.id===id)||DISTRICTS[0]}
+
+const EVENTS=[
+  {id:"derbi",name:"Derbi günü",desc:"Maç var, stadyum çevresi kaynıyor!",demand:1.45,fare:1.2,districts:["besiktas","kadikoy","fatih"],fan:true},
+  {id:"rush",name:"Yoğun saat — çok yolcu",desc:"Trafik ve talep tavan yaptı.",demand:1.5,fare:1.12},
+  {id:"rain",name:"Yağmur yağıyor",desc:"Herkes taksi arıyor.",demand:1.45,fare:1.1,slow:1.2,rain:true},
+  {id:"concert",name:"Konser gecesi",desc:"Sahne sonrası kuyruk uzadı.",demand:1.35,fare:1.15,districts:["beyoglu","besiktas","kadikoy"]},
+  {id:"airport",name:"Havalimanı yoğunluğu",desc:"Uçuşlar üst üste, uzun mesafe bol.",demand:1.2,fare:1.25,air:true},
+  {id:"calm",name:"Sakin bir gün",desc:"Sokaklar rahat, yolcu biraz az.",demand:.8,fare:1},
+  {id:"holiday",name:"Bayram trafiği",desc:"Şehir içi hareketlilik yüksek.",demand:1.3,fare:1.1},
+  {id:"fog",name:"Sisli hava",desc:"Görüş düşük, dikkatli sür.",demand:1.1,fare:1.05,slow:1.25},
+  {id:"payday",name:"Maaş günü",desc:"Bahşişler cömert olabilir.",demand:1.15,fare:1.05,tip:1.25},
+  {id:"snow",name:"Kar yağışı",desc:"Yollar kaygan, talep yüksek.",demand:1.4,fare:1.15,slow:1.3},
+  {id:"festival",name:"Sokak festivali",desc:"Semtler dolup taşıyor.",demand:1.35,fare:1.1,districts:["kadikoy","beyoglu","fatih"]}
+];
+const WEEKLY=[
+  {id:"w-kadikoy",name:"Kadıköy'de sokak festivali",district:"kadikoy",demand:1.4},
+  {id:"w-beyoglu",name:"İstiklal'de gece yoğunluğu",district:"beyoglu",demand:1.4},
+  {id:"w-fatih",name:"Eminönü turist akını",district:"fatih",demand:1.35},
+  {id:"w-besiktas",name:"Beşiktaş çarşı hareketli",district:"besiktas",demand:1.3},
+  {id:"w-bakirkoy",name:"Bakırköy AVM haftası",district:"bakirkoy",demand:1.25},
+  {id:"w-pendik",name:"Pendik feribot kuyruğu",district:"pendik",demand:1.3},
+  {id:"w-sariyer",name:"Sarıyer sahil kalabalık",district:"sariyer",demand:1.25}
+];
+const SHOP=[
+  {id:"gps",name:"GPS Navigasyon",desc:"Sürüş kısalır, zamanlama kolaylaşır.",price:15000},
+  {id:"taksimetre",name:"Dijital Taksimetre",desc:"Yolculuk ücretleri %10 artar.",price:12000},
+  {id:"koltuk",name:"Deri Koltuk Takımı",desc:"Bahşişler %15 artar.",price:20000},
+  {id:"reklam",name:"Araç Reklam Panosu",desc:"Her gün pasif 600 TL gelir.",price:8000},
+  {id:"atolye",name:"Mobil Atölye Kiti",desc:"Tamir ücretleri %25 düşer.",price:25000},
+  {id:"yakitkart",name:"Filo Yakıt Kartı",desc:"Yakıt masrafı %30 azalır.",price:10000},
+  {id:"klima",name:"İklimlendirme Paketi",desc:"Yolcu ruh hali daha kolay yükselir.",price:14000},
+  {id:"kamera",name:"Kabin Kamerası",desc:"Şikayet ve kaza cezaları %30 düşer.",price:18000}
+];
+const QUESTS=[
+  {id:"first_ride",title:"İlk yolcunu al",hint:"Durağındaki sarı butona bas, bir yolcuyu bırak.",check:s=>s.stats.rides>=1,xp:25,cash:1500},
+  {id:"five_rides",title:"5 yolcu taşı",hint:"Direksiyonda kalarak 5 yolculuk tamamla.",check:s=>s.stats.rides>=5,xp:40,cash:2500},
+  {id:"hire_driver",title:"Bir şoför işe al",hint:"Şoför sekmesinden birini filona kat.",check:s=>s.drivers.some(d=>d.hired),xp:40,cash:2000},
+  {id:"assign_driver",title:"Şoförü taksiye ata",hint:"İşine aldığın şoförü bir araca bağla.",check:s=>s.taxis.some(t=>t.driverId),xp:40,cash:2500},
+  {id:"second_taxi",title:"Filona ikinci taksiyi kat",hint:"Galeriden satın al veya kirala.",check:s=>s.taxis.length>=2,xp:60,cash:4000},
+  {id:"second_stand",title:"İkinci bir durak kur",hint:"Haritadan yeni bir semtte durak satın al.",check:s=>s.stands.length>=2,xp:70,cash:5000},
+  {id:"bank_save",title:"Bankaya 10.000 TL yatır",hint:"Birikimin faiz getirsin.",check:s=>s.bank>=10000,xp:50,cash:2000},
+  {id:"level3",title:"Seviye 3'e ulaş (Şoför)",hint:"Yolculuk yap, görevleri bitir, deneyim kazan.",check:s=>s.level>=3,xp:80,cash:8000}
+];
+const ACHIEVEMENTS=[
+  {id:"first_ride",name:"İlk kilit",ic:"🚕",desc:"İlk yolculuğunu tamamla."},
+  {id:"ten_rides",name:"Onluk",ic:"🔟",desc:"10 yolcu taşı.",check:s=>s.stats.rides>=10},
+  {id:"fifty",name:"Ellilik",ic:"⭐",desc:"50 yolcu taşı.",check:s=>s.stats.rides>=50},
+  {id:"filo3",name:"Küçük filo",ic:"🚖",desc:"3 taksiye ulaş.",check:s=>s.taxis.length>=3},
+  {id:"two_stands",name:"İki yakalı",ic:"🗺️",desc:"İkinci durağı kur.",check:s=>s.stands.length>=2},
+  {id:"cash100k",name:"Yüz bin",ic:"💰",desc:"Kasada 100.000 TL tut.",check:s=>s.cash>=100000},
+  {id:"five_star",name:"Beş yıldız",ic:"🌟",desc:"Bir yolculukta 5 yıldız al."},
+  {id:"airport",name:"Pist şoförü",ic:"✈️",desc:"Bir havalimanı bırakışı yap."},
+  {id:"night_owl",name:"Gece kuşu",ic:"🌙",desc:"Gece 00:00–05:00 arası yolcu bırak."},
+  {id:"level5",name:"Usta",ic:"🛠️",desc:"Seviye 5'e çık.",check:s=>s.level>=5},
+  {id:"return_item",name:"Dürüstlük",ic:"📱",desc:"Unutulan eşyayı sahibine teslim et."},
+  {id:"insure",name:"Güvence",ic:"🛡️",desc:"Bir taksiyi sigortala.",check:s=>s.taxis.some(t=>t.insured)},
+  {id:"train",name:"Usta öğretici",ic:"🎓",desc:"Bir şoförü eğit."},
+  {id:"upgrade_stand",name:"Durağı büyüt",ic:"🏗️",desc:"Bir durağı yükselt."}
+];
+const TRAITS=[
+  {id:"careful",name:"Dikkatli",desc:"Kaza riski düşük"},
+  {id:"hasty",name:"Aceleci",desc:"Daha çok kazanç, daha çok kaza"},
+  {id:"honest",name:"Dürüst",desc:"Hakedişinden çalmaz"},
+  {id:"sly",name:"Kurnaz",desc:"Kârın bir kısmını saklayabilir"},
+  {id:"night",name:"Gece kuşu",desc:"Gece vardiyasında verimli"},
+  {id:"rude",name:"Asabi",desc:"Şikayet riski yüksek"},
+  {id:"funny",name:"Şakacı",desc:"Bahşiş biraz artar"},
+  {id:"saver",name:"Tasarruflu",desc:"Daha az yakıt yakar"}
+];
+const RIVAL_NAMES=["Sarılar Kooperatifi","Boğaziçi Taksi","Yıldız Durak","Haliç Filosu","Kartal Koop","Nostalji Taksi","Anadolu Sarı"];
+
+const FIRST=["Ahmet","Mehmet","Ayşe","Fatma","Emre","Elif","Can","Zeynep","Murat","Merve","Hasan","Burak","Deniz","Cem","Selin","Hakan","Derya","Okan","Pınar","Yusuf","Ceren","Serkan","Gül","Barış","İrem","Onur","Seda","Kaan","Aslı","Leyla","Kenan","Nil"];
+const LAST=["Yılmaz","Kaya","Demir","Şahin","Çelik","Yıldız","Yıldırım","Öztürk","Aydın","Arslan","Doğan","Kılıç","Koç","Özdemir","Aslan","Çetin","Kara","Acar","Polat","Erdoğan"];
+const TOURIST_NAMES=["James Miller","Anna Rossi","Hans Weber","Mei Chen","Pierre Dubois","Sara Lund","John Baker","Elena Popov"];
+const CELEB_NAMES=["Yıldız H.","K. Demir","A. Kara","M. Sarı"];
+const DRIVER_POOL=[
+  ["Hasan Kaya",3,14000],["Elif Demir",4,18000],["Murat Çelik",2,11000],["Ayşe Yıldız",3,14500],
+  ["Burak Şahin",5,24000],["Fatma Aydın",2,11500],["Emre Koç",4,19000],["Zeynep Arslan",3,15000],
+  ["Can Yılmaz",1,9000],["Merve Öz",4,18500],["Hakan Doğan",3,15500],["Selin Kara",5,25000],
+  ["Okan Polat",2,12000],["Ceren Acar",3,14800],["Serkan Çetin",4,20000],["Nil Koç",3,16000]
+];
+const LETTERS="ABCDEFGHJKLMNPRSTUVYZ";
+
+const PAX_TYPES={
+  tourist:{id:"tourist",label:"Turist",fare:1.35,tip:1.2,weight:s=>1.1+(eventObj().air?0.6:0),
+    bag:true,mood:70,
+    lines:[
+      {q:"Airport, please? İstanbul Airport?",c:[
+        {t:"Tabii, İST'ye bırakırım.",tip:1.2,mood:8,dest:"ist"},
+        {t:"Sabiha mı, İstanbul mu?",tip:1.05,mood:4},
+        {t:"Taksimetre işler, konuşa konuşa gideriz.",tip:.95,mood:0}
+      ]},
+      {q:"How much to Sultanahmet?",c:[
+        {t:"Taksimetre, dürüstçe.",tip:1.15,mood:6,it:1},
+        {t:"Pazarlık yok, sabit fiyat.",tip:.9,mood:-2},
+        {t:"Turist fiyatı biraz yüksek olur.",tip:.7,mood:-10,it:-2}
+      ]}
+    ]},
+  student:{id:"student",label:"Öğrenci",fare:.85,tip:.7,weight:s=>1.3,mood:60,
+    lines:[
+      {q:"Hocam, öğrenci indirimi çıkar mı?",c:[
+        {t:"Biraz kırarım, buyur bin.",tip:1.2,mood:12,fare:.9},
+        {t:"Taksimetre kardeşim, affet.",tip:.85,mood:-4},
+        {t:"Tamam, bu seferlik yarısını konuşuruz.",tip:1.1,mood:8,fare:.8}
+      ]}
+    ]},
+  business:{id:"business",label:"İş insanı",fare:1.2,tip:1.15,weight:s=>isRush(state.minutes)?1.6:1,mood:55,hurry:true,
+    lines:[
+      {q:"Yetişmem lazım, yirmi dakikam var.",c:[
+        {t:"Yetiştiririm, kemerleri bağla.",tip:1.35,mood:10,fast:1},
+        {t:"Trafiği zorlamam, güvenli gidelim.",tip:.75,mood:-8,slow:1},
+        {t:"En hızlı rotayı seçiyorum.",tip:1.2,mood:6,fast:1}
+      ]}
+    ]},
+  elderly:{id:"elderly",label:"Yaşlı yolcu",fare:1,tip:1.1,weight:s=>1,mood:65,careful:true,
+    lines:[
+      {q:"Yavaş olur musun evladım, acele yok.",c:[
+        {t:"Tabii teyze/amca, rahat gidelim.",tip:1.3,mood:14,slow:1,it:1},
+        {t:"Biraz hızlıysam söyleyin.",tip:1,mood:2},
+        {t:"Trafik akışına uyacağım.",tip:.9,mood:-2}
+      ]}
+    ]},
+  fan:{id:"fan",label:"Tribün",fare:1.15,tip:1.2,weight:s=>eventObj().fan?3:.35,mood:75,
+    lines:[
+      {q:"Maça yetişeceğiz, cirooo!",c:[
+        {t:"Hadi bakalım, stadyuma gazlarız!",tip:1.3,mood:12,fast:1},
+        {t:"Trafik var, elimden geleni yaparım.",tip:1,mood:0},
+        {t:"Koro yapmayın, odaklanayım.",tip:.7,mood:-8}
+      ]}
+    ]},
+  drunk:{id:"drunk",label:"Gece yolcusu",fare:1.1,tip:1.25,weight:s=>{const h=hour(state.minutes);return (h>=22||h<4)?2.2:.15},mood:50,night:true,
+    lines:[
+      {q:"Kardeşşş... evime gidelim, bir de durur muyuz?",c:[
+        {t:"Direkt eve, kemer tak.",tip:1.1,mood:4,it:1},
+        {t:"Bir dururuz ama kusma olmasın.",tip:1.2,mood:8},
+        {t:"Kusura bakma, bu halde almam.",tip:.2,mood:-20,kick:1}
+      ]}
+    ]},
+  pregnant:{id:"pregnant",label:"Hastane acili",fare:1.1,tip:1.3,weight:s=>.55,mood:40,hurry:true,hospital:true,
+    lines:[
+      {q:"Lütfen acele edin, hastaneye yetişmeliyiz!",c:[
+        {t:"Hemen, en yakın acile.",tip:1.4,mood:16,fast:1,it:2},
+        {t:"Güvenli ve hızlı gideceğim.",tip:1.25,mood:10,it:1},
+        {t:"Trafik yoğun, sakin olun.",tip:.8,mood:-6}
+      ]}
+    ]},
+  celebrity:{id:"celebrity",label:"Ünlü",fare:1.6,tip:1.5,weight:s=>.25,mood:60,
+    lines:[
+      {q:"Kimseye bahsetme olur mu? Şuradan dolanalım.",c:[
+        {t:"Sır bende kalır, sessiz gideriz.",tip:1.5,mood:14,it:1},
+        {t:"Tabii, fotoğraf da yok.",tip:1.35,mood:10},
+        {t:"Herkes müşteri, özel muamele yok.",tip:.6,mood:-12}
+      ]}
+    ]},
+  complainer:{id:"complainer",label:"Zor beğenir",fare:1,tip:.7,weight:s=>.8,mood:40,strict:true,
+    lines:[
+      {q:"Klima niye böyle? Müzik de çok yüksek.",c:[
+        {t:"Hemen ayarlıyorum, özür dilerim.",tip:1.2,mood:14},
+        {t:"İdare edin, kısa yol.",tip:.75,mood:-6},
+        {t:"Beğenmezseniz inebilirsiniz.",tip:.4,mood:-16,it:-1}
+      ]}
+    ]},
+  chatter:{id:"chatter",label:"Sohbetçi",fare:1,tip:1.15,weight:s=>1,mood:70,
+    lines:[
+      {q:"Nerelisin? Evli misin? Trafik hep böyle mi?",c:[
+        {t:"Anlat anlat, yol kısa gelir.",tip:1.3,mood:12},
+        {t:"Biraz sohbet, biraz yol.",tip:1.1,mood:6},
+        {t:"Müsaade, yola bakayım.",tip:.8,mood:-6}
+      ]}
+    ]},
+  vip:{id:"vip",label:"VIP transfer",fare:1.8,tip:1.4,weight:s=>eventObj().air?1.3:.4,mood:60,airport:true,
+    lines:[
+      {q:"VIP transfer, valizler arkada. Uçağa yetişmeliyim.",c:[
+        {t:"Kapıdan kapıya, yetiştiririm.",tip:1.4,mood:10,fast:1,destAir:1},
+        {t:"Trafik durumuna göre en iyisi.",tip:1.15,mood:4,destAir:1},
+        {t:"Havalimanı bakımlı yol, sakin gidelim.",tip:1,mood:0,destAir:1}
+      ]}
+    ]},
+  regular:{id:"regular",label:"Yolcu",fare:1,tip:1,weight:s=>1.1,mood:62,
+    lines:[
+      {q:"Nereye mi? Söyleyeyim, taksimetre işlesin.",c:[
+        {t:"Hoş geldiniz, nereye gidiyoruz?",tip:1.15,mood:8,it:1},
+        {t:"Buyrun, nereye?",tip:1,mood:2},
+        {t:"Binin, söyleyin gidelim.",tip:.75,mood:-4}
+      ]}
+    ]}
+};
+
+const MID_GENERIC=[
+  {q:"Biraz acele edebilir miyiz?",good:"Tabii, yetiştiririm.",bad:"Trafik var, elimden geleni yaparım."},
+  {q:"Klimayı açar mısınız?",good:"Hemen açıyorum, buyurun.",bad:"Yakıt yakıyor, biraz açık kalsın."},
+  {q:"Şu yoldan gitsek daha hızlı olmaz mı?",good:"Haklısınız, oradan dolanıyorum.",bad:"Bildiklerimden gideyim, güvenli olsun."},
+  {q:"Radyoyu biraz kısabilir misiniz?",good:"Tabii, hemen.",bad:"Bu benim rutinem, idare edin."}
+];
+
+const RIDE_EVENTS=[
+  {id:"jam",title:"Trafik sıkıştı",text:"Önde kaza var, kuyruk uzuyor.",c:[
+    {t:"Yan yollardan kaç",tip:1.1,mood:6,fast:1,risk:1},
+    {t:"Ana yolda bekle",tip:.9,mood:-4,slow:1},
+    {t:"Kısa bir mola, sakin olalım",tip:1,mood:2}
+  ]},
+  {id:"police",title:"Polis noktası",text:"Kontrol noktası, evrak soracaklar.",c:[
+    {t:"Dur, evrakları ver",tip:1,mood:0,it:1,delay:1},
+    {t:"Sakinçe sıraya gir",tip:1,mood:-2,delay:1},
+    {t:"Çevirmeyi dolan (riskli)",tip:1.05,mood:4,risk:1,it:-2}
+  ]},
+  {id:"tire",title:"Lastik patladı",text:"Ön lastik havasını kaçırdı.",c:[
+    {t:"Stepneyi tak, devam (20 dk)",mood:-4,delay:2,cost:0},
+    {t:"Yol yardım çağır (800 TL)",mood:2,delay:1,cost:800},
+    {t:"Yavaşla, yetişelim",mood:-8,tip:.8,risk:1}
+  ]},
+  {id:"atm",title:"ATM isteği",text:"Yolcu bankamatikte durmamızı istiyor.",c:[
+    {t:"Tabii, şuradaki ATM'ye uğrarız",tip:1.2,mood:10,delay:1},
+    {t:"Yakında dururum ama hızlı olun",tip:1.05,mood:4,delay:1},
+    {t:"Rotayı bozamam, özür dilerim",tip:.75,mood:-10}
+  ]},
+  {id:"wallet",title:"Cüzdan unutulmuş",text:"Yolcu ödemeye gelince cüzdanı yok diyor.",c:[
+    {t:"İner, sonra öder — güveniyorum",tip:0,mood:8,it:2,fareCut:.0,kind:"trust"},
+    {t:"Bir yakını gelsin, bekleriz",tip:.8,mood:2,delay:2},
+    {t:"Güzergahı geri alırım, inmez",tip:.5,mood:-8,it:-1}
+  ]},
+  {id:"radar",title:"Radar!",text:"Hız tabelası ve flaş.",c:[
+    {t:"Yavaşla, cezaya girmeyelim",mood:2,slow:1},
+    {t:"Geçtiyse geçti",mood:0,cost:0,kind:"radar"},
+    {t:"Şeritten sakin çık",mood:4}
+  ]},
+  {id:"works",title:"Yol çalışması",text:"Şerit kapanmış, sapmak lazım.",c:[
+    {t:"Yönlendirmeyi izle",tip:1,mood:0,slow:1},
+    {t:"GPS'ten alternatif",tip:1.1,mood:6,fast:1},
+    {t:"Geri dön, başka cadde",tip:.95,mood:-2,delay:1}
+  ]},
+  {id:"rain",title:"Ani sağanak",text:"Camlar buğulanıyor, yol kaygan.",c:[
+    {t:"Yavaş ve dikkatli",tip:1.15,mood:8,slow:1,it:1},
+    {t:"Temponu bozma",tip:.9,mood:-4,risk:1},
+    {t:"Biraz bekleyip geçsin",tip:1,mood:2,delay:1}
+  ]}
+];
+const TAP_EV=[
+  {id:"light",title:"Kırmızı ışık!",hint:"Zamanında frenle"},
+  {id:"hole",title:"Çukur!",hint:"Son anda kaç"},
+  {id:"ped",title:"Yaya çıkıyor!",hint:"Dikkatli ol"},
+  {id:"traf",title:"Ani fren!",hint:"Mesafeyi koru"},
+  {id:"lane",title:"Şerit değişimi",hint:"Boşluğu yakala"}
+];
+
+function carById(id){return CARS.find(c=>c.id===id)}
+function distById(id){return DISTRICTS.find(d=>d.id===id)}
+function levelInfo(level){return LEVELS.find(l=>l.level===level)||LEVELS[0]}
+function xpForLevel(level){const cur=LEVELS.find(l=>l.level===level),next=LEVELS.find(l=>l.level===level+1);return {cur:cur?cur.xp:0,next:next?next.xp:null}}
+function hour(m){return (((m%1440)+1440)%1440)/60}
+function todFromMinutes(m){const h=hour(m);if(h>=6&&h<8)return"dawn";if(h>=8&&h<17)return"day";if(h>=17&&h<19.5)return"dusk";return"night"}
+function isRush(m){const h=hour(m);return (h>=7.5&&h<9.5)||(h>=17&&h<20)}
+function eventObj(){return EVENTS.find(e=>e.id===(state&&state.eventId))||EVENTS[5]}
+function clockStr(min){const m=((min%1440)+1440)%1440;return pad2(Math.floor(m/60))+":"+pad2(m%60)}
+function standCap(st){return 1+(st.level||1)}
+function standFee(st){const d=distById(st.id);return Math.round((d?1200+d.prestige*800:1500)*(st.level||1))}
+function standUpgradeCost(st){const d=distById(st.id);return Math.round((d?d.standCost:40000)*0.55*st.level)}
+/* ===== SVG ART ===== */
+function taxiSvg(modelId, plate, opt={}) {
+  const car = carById(modelId) || CARS[0];
+  const shape = car.shape;
+  const c = car.color || "#ffc400";
+  const dark = shape === "premium";
+  const body = dark ? "#1c1c1e" : c;
+  const stripe = dark ? "#ffc400" : "#111";
+  const w = opt.w || 200, h = opt.h || 80;
+  const plateTxt = (plate || "34 TKS 17").slice(0, 10);
+  let bodyPath, cabin, win, bumper, hlight, tlight, roof;
+  if (shape === "hatch") {
+    bodyPath = `M22 50 C24 40, 30 36, 42 36 L58 36 L70 22 L128 22 L148 36 L170 38 C180 38, 184 44, 184 50 L184 58 L22 58 Z`;
+    cabin = "";
+    win = `<path d="M72 24 L86 24 L86 36 L62 36 Z" fill="#7eb8d8" stroke="#1a1400" stroke-width="1"/>
+           <path d="M90 24 L124 24 L140 36 L90 36 Z" fill="#7eb8d8" stroke="#1a1400" stroke-width="1"/>`;
+    roof = 16;
+  } else if (shape === "sedan") {
+    bodyPath = `M18 52 C20 42, 28 38, 44 38 L58 38 L72 20 L130 20 L150 38 L182 40 C190 40, 194 46, 194 52 L194 60 L18 60 Z`;
+    win = `<path d="M74 22 L92 22 L92 38 L62 38 Z" fill="#7eb8d8" stroke="#1a1400" stroke-width="1"/>
+           <path d="M96 22 L126 22 L144 38 L96 38 Z" fill="#7eb8d8" stroke="#1a1400" stroke-width="1"/>`;
+    roof = 14;
+  } else if (shape === "van" || shape === "mpv") {
+    bodyPath = `M20 54 C22 36, 30 20, 48 18 L160 18 L178 22 C188 24, 190 36, 190 48 L190 60 L20 60 Z`;
+    win = `<rect x="52" y="22" width="28" height="20" rx="2" fill="#7eb8d8" stroke="#1a1400"/>
+           <rect x="84" y="22" width="30" height="20" rx="2" fill="#7eb8d8" stroke="#1a1400"/>
+           <rect x="118" y="22" width="36" height="20" rx="2" fill="#7eb8d8" stroke="#1a1400"/>`;
+    roof = 10;
+  } else { // premium van
+    bodyPath = `M16 54 C18 34, 28 16, 50 14 L168 14 L188 20 C196 24, 198 36, 198 50 L198 62 L16 62 Z`;
+    win = `<rect x="54" y="20" width="30" height="22" rx="2" fill="#9ec8e0" stroke="#111"/>
+           <rect x="88" y="20" width="32" height="22" rx="2" fill="#9ec8e0" stroke="#111"/>
+           <rect x="124" y="20" width="42" height="22" rx="2" fill="#9ec8e0" stroke="#111"/>
+           <rect x="28" y="28" width="18" height="14" rx="2" fill="#222" stroke="#ffc400" stroke-width="0.8"/>`;
+    roof = 8;
+  }
+  const wheel = (cx) => `<g>
+    <circle cx="${cx}" cy="60" r="11" fill="#1a1a1a"/>
+    <circle cx="${cx}" cy="60" r="6.5" fill="#888" stroke="#ccc" stroke-width="1.2"/>
+    <circle cx="${cx}" cy="60" r="2" fill="#333"/>
+  </g>`;
+  return `<svg viewBox="0 0 210 80" width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg" class="taxi-svg">
+    <ellipse cx="105" cy="68" rx="78" ry="5" fill="rgba(0,0,0,.28)"/>
+    <path d="${bodyPath}" fill="${body}" stroke="#111" stroke-width="1.2"/>
+    ${win}
+    <rect x="40" y="44" width="${dark?130:120}" height="7" fill="url(#chk${opt.uid||''})" />
+    <rect x="86" y="${roof-8}" width="36" height="10" rx="2" fill="#1a1400"/>
+    <text x="104" y="${roof}" text-anchor="middle" font-size="7" font-weight="800" fill="${dark?"#ffc400":"#ffc400"}" font-family="Noto Sans,Arial">TAKSİ</text>
+    <rect x="${shape==="premium"?170:158}" y="46" width="28" height="10" rx="1.5" fill="#f4f1e0" stroke="#111" stroke-width=".8"/>
+    <text x="${shape==="premium"?184:172}" y="54" text-anchor="middle" font-size="5.2" font-weight="700" fill="#111" font-family="Noto Sans,Arial">${esc(plateTxt)}</text>
+    <rect x="18" y="42" width="7" height="6" rx="1" fill="#ffe9a0"/>
+    <rect x="${shape==="premium"?192:186}" y="42" width="6" height="6" rx="1" fill="#ff4a3a"/>
+    ${wheel(52)} ${wheel(150)}
+    <defs>
+      <pattern id="chk${opt.uid||''}" width="10" height="7" patternUnits="userSpaceOnUse">
+        <rect width="5" height="7" fill="${stripe}"/><rect x="5" width="5" height="7" fill="${dark?"#111":c}"/>
+      </pattern>
+    </defs>
+  </svg>`;
+}
+function trafficSvg(color, flip) {
+  const c = color || pick(["#c44","#4a7","#348","#ccc","#222","#a63"]);
+  return `<svg viewBox="0 0 120 44" width="90" height="34" style="${flip?"transform:scaleX(-1)":""}" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 28 L18 16 L48 12 L88 12 L108 22 L112 28 L112 34 L10 34 Z" fill="${c}" stroke="#111" stroke-width=".8"/>
+    <path d="M50 14 L66 14 L78 22 L50 22 Z" fill="#9ec8e0"/>
+    <circle cx="32" cy="34" r="7" fill="#1a1a1a"/><circle cx="32" cy="34" r="3.5" fill="#888"/>
+    <circle cx="90" cy="34" r="7" fill="#1a1a1a"/><circle cx="90" cy="34" r="3.5" fill="#888"/>
+  </svg>`;
+}
+function mosqueSvg() {
+  return `<svg class="mosque" viewBox="0 0 140 80" width="140" height="80" xmlns="http://www.w3.org/2000/svg" style="right:8%;height:42%">
+    <rect x="20" y="48" width="100" height="32" fill="#1a2438"/>
+    <path d="M40 48 Q70 8 100 48 Z" fill="#24304c"/>
+    <rect x="8" y="20" width="6" height="60" fill="#1a2438"/><circle cx="11" cy="16" r="5" fill="#1a2438"/>
+    <rect x="126" y="24" width="5" height="56" fill="#1a2438"/><circle cx="128.5" cy="20" r="4" fill="#1a2438"/>
+    <rect x="66" y="30" width="8" height="20" fill="#1a2438"/>
+  </svg>`;
+}
+function buildingHtml() {
+  const specs=[[2,22,28],[10,30,42],[18,16,50],[24,22,36],[32,18,54],[40,26,40],[50,20,46],[58,14,34],[66,24,58],[76,18,38],[84,28,50],[94,16,30]];
+  return specs.map((s,i)=>`<div class="bldg" style="left:${s[0]}%;width:${s[1]}px;height:${s[2]}%;background:linear-gradient(${i%2?"#2b3654":"#24304c"},#1a2238)"></div>`).join("");
+}
+function avaSvg(ava, size) {
+  const s=size||64, hair=ava.hair, skin=ava.skin, st=ava.style, shirt=ava.shirt||"#3a6ea5";
+  let extra="";
+  if(st==="hijab") extra=`<path d="M6 30 C6 6, ${s-6} 6, ${s-6} 32 L${s-6} ${s} L6 ${s} Z" fill="${hair}"/><circle cx="${s/2}" cy="${s*0.44}" r="${s*0.2}" fill="${skin}"/>`;
+  else if(st==="beard") extra=`<ellipse cx="${s/2}" cy="${s*0.78}" rx="${s*0.18}" ry="${s*0.14}" fill="${hair}"/>
+    <rect x="${s*0.2}" y="${s*0.12}" width="${s*0.6}" height="${s*0.18}" rx="6" fill="${hair}"/>`;
+  else if(st==="long") extra=`<path d="M10 28 Q10 6 ${s/2} 6 Q${s-10} 6 ${s-10} 28 L${s-6} 62 L6 62 Z" fill="${hair}"/>`;
+  else if(st==="bun") extra=`<circle cx="${s/2}" cy="10" r="8" fill="${hair}"/><rect x="${s*0.2}" y="${s*0.14}" width="${s*0.6}" height="${s*0.16}" rx="6" fill="${hair}"/>`;
+  else if(st==="cap") extra=`<rect x="${s*0.18}" y="${s*0.1}" width="${s*0.64}" height="${s*0.2}" rx="4" fill="${ava.cap||"#1a3a6a"}"/><rect x="${s*0.12}" y="${s*0.22}" width="${s*0.4}" height="4" fill="${ava.cap||"#1a3a6a"}"/>`;
+  else extra=`<rect x="${s*0.18}" y="${s*0.1}" width="${s*0.64}" height="${s*0.22}" rx="8" fill="${hair}"/>`;
+  const glasses = ava.glasses ? `<rect x="${s*0.3}" y="${s*0.4}" width="10" height="7" rx="2" fill="none" stroke="#222" stroke-width="1.4"/>
+    <rect x="${s*0.54}" y="${s*0.4}" width="10" height="7" rx="2" fill="none" stroke="#222" stroke-width="1.4"/>
+    <path d="M${s*0.4+6} ${s*0.43} H${s*0.54}" stroke="#222" stroke-width="1.2"/>` : "";
+  const wrinkle = ava.age==="old" ? `<path d="M${s*0.36} ${s*0.38} Q${s*0.4} ${s*0.36} ${s*0.44} ${s*0.38}" stroke="#000" stroke-opacity=".25" fill="none"/>` : "";
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${s/2}" cy="${s/2}" r="${s/2}" fill="${shirt}"/>
+    <circle cx="${s/2}" cy="${s*0.48}" r="${s*0.28}" fill="${skin}"/>
+    ${extra}${glasses}${wrinkle}
+    <circle cx="${s*0.4}" cy="${s*0.46}" r="3" fill="#1a1a1a"/>
+    <circle cx="${s*0.6}" cy="${s*0.46}" r="3" fill="#1a1a1a"/>
+  </svg>`;
+}
+function figSvg(ava, bag) {
+  const skin=ava.skin||"#e0b090", shirt=ava.shirt||"#3a6ea5";
+  return `<svg width="22" height="40" viewBox="0 0 22 40" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="11" cy="7" r="6" fill="${skin}"/>
+    <rect x="5" y="13" width="12" height="14" rx="3" fill="${shirt}"/>
+    <rect x="6" y="27" width="4" height="12" fill="#2a2e3e"/><rect x="12" y="27" width="4" height="12" fill="#2a2e3e"/>
+    ${bag?`<rect x="16" y="20" width="6" height="8" rx="1" fill="#6a4a2a"/>`:""}
+  </svg>`;
+}
+function makeAva(type) {
+  const skin=pick(["#f0c8a0","#e0b090","#c68642","#8d5524","#f3d1b0"]);
+  const hair=pick(["#1a1a1a","#3a2a1a","#6a4420","#c0c0c0","#2a1a10","#4a2a18"]);
+  let style=pick(["short","long","hijab","beard","bun","cap"]);
+  if(type==="elderly"){style=pick(["short","beard","hijab"]);}
+  if(type==="pregnant"){style=pick(["hijab","long","bun","short"]);}
+  if(type==="tourist"){style=pick(["short","cap","long","beard"]);}
+  if(type==="fan"){style=pick(["cap","short","beard"]);}
+  const shirt=type==="fan"?pick(["#000","#111","#c00","#fff"]):
+    type==="business"?pick(["#1a1a2a","#222","#2a2a40"]):
+    type==="student"?pick(["#3a6ea5","#7a3040","#2d5a38","#d4a017"]):
+    pick(["#3a6ea5","#8a3040","#2d5a38","#4a3a6a","#5a4a2a","#c45"]);
+  return {skin,hair,style,shirt,glasses:chance(.28)||type==="business",cap:type==="fan"?"#111":"#1a3a6a",age:type==="elderly"?"old":"adult",bag:type==="tourist"||type==="vip"};
+}
+
+/* ===== STATE ===== */
+let state=null, view="durak", paused=false, ride=null, tickTimer=null, toastTimer=null;
+let selectedDistrict="uskudar", waitingCount=3, audioCtx=null;
+
+function demandMul(districtId){
+  let d=1;
+  const ev=eventObj();
+  if(ev){if(!ev.districts||ev.districts.includes(districtId)) d*=ev.demand||1}
+  if(state.weekly&&state.weekly.district===districtId) d*=state.weekly.demand||1;
+  if(isRush(state.minutes)) d*=1.35;
+  const h=hour(state.minutes);
+  if(h>=1&&h<6) d*=.35; else if(h>=23||h<1) d*=.55;
+  const it=state.itibar[districtId]??60;
+  d*=.7+it/200;
+  const rival=state.rivals[districtId];
+  if(rival) d*=clamp(1-rival.power*0.08,0.55,1);
+  const st=getStand(districtId);
+  if(st) d*=1+(st.level-1)*0.08;
+  return d;
+}
+function distKm(a,b){
+  const A=destById(a),B=destById(b);
+  if(!A||!B) return 8;
+  let dx=(A.x||50)-(B.x||50), dy=(A.y||50)-(B.y||50);
+  let d=Math.sqrt(dx*dx+dy*dy)*0.55;
+  if(A.side&&B.side&&A.side!==B.side) d+=6;
+  if(A.airport||B.airport) d+=8;
+  return clamp(d,3,55);
+}
+function plateGen(used){
+  let p,n=0; do{
+    const L=LETTERS[irand(0,LETTERS.length-1)]+LETTERS[irand(0,LETTERS.length-1)]+LETTERS[irand(0,LETTERS.length-1)];
+    p="34 "+L+" "+pad2(irand(1,99)); n++;
+  }while(used.has(p)&&n<80);
+  used.add(p); return p;
+}
+function paxName(type){
+  if(type==="tourist") return pick(TOURIST_NAMES);
+  if(type==="celebrity") return pick(CELEB_NAMES);
+  return pick(FIRST)+" "+pick(LAST);
+}
+function makeStand(id,level=1){return {id,level}}
+function getStand(id){return (state.stands||[]).find(s=>(s.id||s)===id)}
+function ownedStand(id){return !!getStand(id)}
+function standIdList(){return state.stands.map(s=>s.id||s)}
+
+function defaultState(name){
+  const itibar={}; DISTRICTS.forEach(d=>{itibar[d.id]=62+d.prestige*2});
+  const taxiId=uid("tx");
+  const rivals={};
+  DISTRICTS.forEach(d=>{if(chance(.7)) rivals[d.id]={name:pick(RIVAL_NAMES),power:irand(1,3)}});
+  return {
+    version:2, name:(name||"İzzet").slice(0,18),
+    cash:50000, bank:0, loan:0, xp:0, level:1,
+    day:1, month:1, year:2026, minutes:8*60,
+    itibar, stands:[makeStand("uskudar",1)], currentStand:"uskudar",
+    taxis:[{id:taxiId,modelId:"klia",plate:"34 TKS 17",owned:true,condition:82,fuel:78,driverId:null,standId:"uskudar",
+      rides:0,earnings:0,buyPrice:98000,rent:0,km:12400,insured:false,lastServiceKm:10000,plateOwned:true}],
+    drivers:[], marketDrivers:[], activeTaxiId:taxiId,
+    questIndex:0, questDone:[], daily:[],
+    eventId:"calm", eventUntil:2, weekly:WEEKLY[0], weekStart:1,
+    upgrades:{}, stats:{rides:0,earned:0,tips:0,days:1,airports:0,nights:0,fiveStars:0},
+    sound:true, galeriTab:"yeni", garajTab:"filo",
+    history:[], achievements:[], leftItems:[], rivals,
+    plateMarket:[], lastReport:null, todayIn:0, todayOut:0
+  };
+}
+function migrate(s){
+  if(!s||!s.version) return null;
+  if(s.version===1){
+    s.version=2;
+    s.stands=(s.stands||[]).map(id=>typeof id==="string"?makeStand(id,1):id);
+    (s.taxis||[]).forEach(t=>{
+      t.km=t.km??Math.round((t.rides||0)*14+rand(2000,18000));
+      t.insured=!!t.insured; t.lastServiceKm=t.lastServiceKm??Math.max(0,t.km-2000);
+      t.plateOwned=t.plateOwned??true;
+    });
+    (s.drivers||[]).forEach(d=>{
+      d.honesty=d.honesty??irand(2,5); d.fatigue=d.fatigue??0; d.morale=d.morale??70;
+      d.traits=d.traits&&d.traits.length?d.traits:[pick(TRAITS).id]; d.trainLvl=d.trainLvl??0;
+    });
+    s.history=s.history||[]; s.achievements=s.achievements||[]; s.leftItems=s.leftItems||[];
+    s.rivals=s.rivals||{}; s.plateMarket=s.plateMarket||[]; s.lastReport=s.lastReport||null;
+    s.todayIn=s.todayIn||0; s.todayOut=s.todayOut||0;
+    if(!s.stats) s.stats={rides:0,earned:0,tips:0,days:1};
+    s.stats.airports=s.stats.airports||0; s.stats.nights=s.stats.nights||0; s.stats.fiveStars=s.stats.fiveStars||0;
+    DISTRICTS.forEach(d=>{if(!s.rivals[d.id]&&chance(.6)) s.rivals[d.id]={name:pick(RIVAL_NAMES),power:irand(1,3)}});
+  }
+  if(!Array.isArray(s.stands)) s.stands=[];
+  s.stands=s.stands.map(x=>typeof x==="string"?makeStand(x,1):x);
+  s.history=s.history||[]; s.achievements=s.achievements||[]; s.leftItems=s.leftItems||[];
+  s.rivals=s.rivals||{}; s.todayIn=s.todayIn||0; s.todayOut=s.todayOut||0;
+  return s;
+}
+
+function soundEnabled(){return state&&state.sound}
+function beep(freq,dur,type="sine",vol=0.05){
+  if(!soundEnabled()) return;
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=vol;
+    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+dur);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+function sfx(kind){
+  if(kind==="click") beep(440,.05,"square",.03);
+  if(kind==="cash"){beep(523,.08,"sine",.05);setTimeout(()=>beep(784,.12,"sine",.05),80)}
+  if(kind==="ok"){beep(660,.1,"sine",.05);setTimeout(()=>beep(880,.14,"sine",.05),90)}
+  if(kind==="bad") beep(180,.2,"sawtooth",.04);
+  if(kind==="tap") beep(920,.06,"square",.04);
+  if(kind==="horn"){beep(420,.12,"square",.04);setTimeout(()=>beep(420,.18,"square",.04),160)}
+  if(kind==="achieve"){beep(784,.1,"sine",.05);setTimeout(()=>beep(988,.18,"sine",.05),120)}
+}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}}
+function load(){try{const raw=localStorage.getItem(SAVE_KEY);if(!raw)return null;return migrate(JSON.parse(raw))}catch(e){return null}}
+function wipeSave(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
+
+function coinPop(n){
+  const el=document.createElement("div");
+  el.className="coin-pop"+(n<0?" out":"");
+  el.textContent=(n>=0?"+":"")+tl(n);
+  $("#fx").appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+function addCash(n,meta){
+  state.cash=Math.round(state.cash+n);
+  if(meta!=="xfer"){
+    if(n>0){state.stats.earned+=n;state.todayIn+=n}
+    if(n<0) state.todayOut+=-n;
+  }
+  if(n) coinPop(n);
+}
+function addXp(n){
+  state.xp+=n;
+  while(true){
+    const next=LEVELS.find(l=>l.level===state.level+1);
+    if(!next||state.xp<next.xp) break;
+    state.level=next.level; toast("Seviye atladın: "+next.name+"!"); sfx("ok");
+  }
+}
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),2400);
+}
+function taxisAt(standId){return state.taxis.filter(t=>t.standId===standId)}
+function driverById(id){return state.drivers.find(d=>d.id===id)}
+function taxiById(id){return state.taxis.find(t=>t.id===id)}
+function activeTaxi(){return taxiById(state.activeTaxiId)||state.taxis[0]}
+
+function grantAch(id){
+  if(state.achievements.includes(id)) return;
+  const a=ACHIEVEMENTS.find(x=>x.id===id); if(!a) return;
+  state.achievements.push(id);
+  toast("Rozet kazandın: "+a.ic+" "+a.name);
+  sfx("achieve");
+}
+function checkAchs(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(a.check&&a.check(state)) grantAch(a.id);
+  });
+}
+function refreshMarketDrivers(){
+  const hired=new Set(state.drivers.map(d=>d.name));
+  const pool=DRIVER_POOL.filter(x=>!hired.has(x[0])).sort(()=>Math.random()-.5).slice(0,5);
+  state.marketDrivers=pool.map(([name,skill,salary])=>({
+    id:uid("md"),name,skill,salary,
+    honesty:irand(2,5),traits:[pick(TRAITS).id],fatigue:0,morale:70
+  }));
+}
+function refreshPlates(){
+  const used=new Set(state.taxis.map(t=>t.plate));
+  state.plateMarket=Array.from({length:4},()=>{
+    const fancy=chance(.35);
+    const p=fancy?("34 "+pick(["TAK","SAR","IST","34A"].filter(Boolean).concat(["GOLD","VIP"]).slice(0,0) || []) ) : plateGen(used);
+    // nicer fancy plates
+    return null;
+  });
+  state.plateMarket=[];
+  const used2=new Set(state.taxis.map(t=>t.plate));
+  for(let i=0;i<4;i++){
+    const fancy=chance(.4);
+    let p;
+    if(fancy){
+      const tag=pick(["TAK","SAR","IST","VIP","34S","KRK"]);
+      p="34 "+tag+" "+pad2(irand(1,99));
+      if(used2.has(p)) p=plateGen(used2); else used2.add(p);
+    } else p=plateGen(used2);
+    state.plateMarket.push({id:uid("pl"),plate:p,fancy,price:fancy?irand(18000,45000):irand(6000,14000)});
+  }
+}
+function makeDaily(){
+  const dest=pick(DISTRICTS).id;
+  state.daily=[
+    {id:"d_rides",title:"8 yolcu taşı",need:8,have:0,xp:20,cash:2000},
+    {id:"d_earn",title:"5.000 TL kazan",need:5000,have:0,xp:20,cash:1500},
+    {id:"d_dest",title:distById(dest).name+" bırakışı",need:1,have:0,dest,xp:15,cash:1200}
+  ];
+}
+function rollEvent(){const ev=pick(EVENTS);state.eventId=ev.id;state.eventUntil=state.day+irand(1,2)}
+function maybeWeekly(){if((state.day-1)%7===0){state.weekly=pick(WEEKLY);state.weekStart=state.day}}
+function computeWaiting(){
+  const d=state.currentStand, dens=distById(d)?.density||2;
+  let n=dens*1.2*demandMul(d)+Math.sin(state.minutes/40)*1.2;
+  waitingCount=clamp(Math.round(n),0,14); return waitingCount;
+}
+function canDriveTaxi(t){return t&&t.standId===state.currentStand&&t.condition>=8&&t.fuel>=6}
+function playerTaxi(){
+  const cur=activeTaxi();
+  if(cur&&canDriveTaxi(cur)) return cur;
+  return state.taxis.find(t=>canDriveTaxi(t)&&!t.driverId)||state.taxis.find(t=>canDriveTaxi(t));
+}
+
+function checkQuests(){
+  let n=0;
+  while(state.questIndex<QUESTS.length){
+    const q=QUESTS[state.questIndex];
+    if(!q.check(state)) break;
+    state.questDone.push(q.id); addXp(q.xp); addCash(q.cash);
+    state.questIndex++; toast("Görev tamam: "+q.title+"  +"+tl(q.cash)); n++;
+  }
+  if(n){sfx("ok");save()}
+  checkAchs();
+}
+function checkDaily(kind,amount,dest){
+  state.daily.forEach(t=>{
+    if(t.have>=t.need) return;
+    if(t.id==="d_rides"&&kind==="ride") t.have+=1;
+    if(t.id==="d_earn"&&kind==="earn") t.have=clamp(t.have+amount,0,t.need);
+    if(t.id==="d_dest"&&kind==="dest"&&dest===t.dest) t.have=1;
+    if(t.have>=t.need&&!t.paid){
+      t.paid=true; addXp(t.xp); addCash(t.cash); toast("Günlük görev: +"+tl(t.cash)); sfx("cash");
+    }
+  });
+}
+
+function traitOf(d,id){return d.traits&&d.traits.includes(id)}
+function passiveForTaxi(t){
+  const car=carById(t.modelId), drv=driverById(t.driverId);
+  if(!drv) return {gain:0,fuel:0,note:""};
+  const d=distById(t.standId), ev=eventObj(), it=state.itibar[t.standId]??60;
+  let earn=1600+(car.comfort||2)*380+drv.skill*520;
+  earn*=(d?.density||2)/3; earn*=.7+it/200; earn*=ev.demand||1;
+  if(state.weekly&&state.weekly.district===t.standId) earn*=state.weekly.demand||1;
+  earn*=(.5+t.condition/200);
+  if(drv.fatigue>70) earn*=.7; else if(drv.fatigue>40) earn*=.85;
+  earn*=.7+drv.morale/250;
+  if(traitOf(drv,"hasty")) earn*=1.12;
+  if(traitOf(drv,"funny")) earn*=1.06;
+  if(traitOf(drv,"night")&&(hour(state.minutes)<7||hour(state.minutes)>21)) earn*=1.1;
+  const st=getStand(t.standId);
+  const atStand=taxisAt(t.standId).length;
+  if(st&&atStand>standCap(st)) earn*=0.65;
+  earn*=.85+Math.random()*.3;
+  if(traitOf(drv,"sly")||drv.honesty<=2){const steal=earn*(0.08*(5-drv.honesty)/4); earn-=steal}
+  let fuelUse=rand(16,30)*(car.fuel==="Dizel"?1.1:1)*(state.upgrades.yakitkart?0.7:1);
+  if(traitOf(drv,"saver")) fuelUse*=.8;
+  return {gain:Math.round(earn),fuel:fuelUse};
+}
+
+function rollDriverWorld(report){
+  const logs=report||[];
+  state.taxis.forEach(t=>{
+    if(!t.driverId) return;
+    const drv=driverById(t.driverId); if(!drv) return;
+    // fatigue / morale
+    drv.fatigue=clamp(drv.fatigue+irand(8,18),0,100);
+    drv.morale=clamp(drv.morale+irand(-6,5)+(t.condition<40?-6:0),0,100);
+    // breakdown
+    const since=t.km-(t.lastServiceKm||0);
+    const risk=clamp((100-t.condition)/400 + since/80000 + (drv.fatigue>80?0.08:0) + (traitOf(drv,"hasty")?0.04:0) - (traitOf(drv,"careful")?0.04:0),0,.35);
+    if(chance(risk)){
+      const dmg=irand(2500,9000);
+      const pay=t.insured?Math.round(dmg*0.25):dmg;
+      const cam=state.upgrades.kamera?0.7:1;
+      const cost=Math.round(pay*cam);
+      t.condition=clamp(t.condition-irand(8,20),5,100);
+      addCash(-cost);
+      logs.push("⚠️ "+t.plate+" kaza/arıza  -"+tl(cost)+(t.insured?" (sigorta)":""));
+      if(traitOf(drv,"rude")||chance(.3)) drv.morale-=8;
+    }
+    // complaint
+    if((traitOf(drv,"rude")&&chance(.15))||chance(.04)){
+      const fine=Math.round(800*(state.upgrades.kamera?0.7:1));
+      addCash(-fine); state.itibar[t.standId]=clamp((state.itibar[t.standId]??60)-3,20,99);
+      logs.push("😠 Şikayet: "+drv.name+"  -"+tl(fine));
+      drv.morale-=5;
+    }
+    // raise
+    if(drv.morale<45&&chance(.35)||(drv.morale<25&&chance(.6))){
+      const want=Math.round(drv.salary*0.12);
+      drv._raise=want;
+    }
+    // quit
+    if(drv.morale<18&&chance(.5)||drv.fatigue>95&&chance(.2)){
+      logs.push("👋 "+drv.name+" işten ayrıldı.");
+      t.driverId=null;
+      state.drivers=state.drivers.filter(x=>x.id!==drv.id);
+    }
+  });
+  return logs;
+}
+
+function applyDayEnd(){
+  const report=[]; let total=0;
+  state.taxis.forEach(t=>{
+    if(!t.driverId) return;
+    const r=passiveForTaxi(t);
+    t.earnings+=r.gain; t.rides+=irand(6,14);
+    t.km+=irand(80,180);
+    t.condition=clamp(t.condition-rand(1.2,3.2)*(carById(t.modelId).wear||1),5,100);
+    t.fuel=clamp(t.fuel-r.fuel,0,100);
+    addCash(r.gain); total+=r.gain;
+    const drv=driverById(t.driverId);
+    report.push((drv?drv.name:"Şoför")+" / "+t.plate+"  +"+tl(r.gain));
+  });
+  // rest unassigned drivers slightly
+  state.drivers.forEach(d=>{if(!d.taxiId){d.fatigue=clamp(d.fatigue-18,0,100);d.morale=clamp(d.morale+3,0,100)}});
+  if(state.upgrades.reklam){addCash(600);total+=600;report.push("Reklam panosu  +600 TL")}
+  const more=rollDriverWorld(report);
+  checkDaily("earn",total);
+  const dayRec={day:state.day,income:state.todayIn,expense:state.todayOut,rides:state.stats.rides};
+  state.history=(state.history||[]).concat([dayRec]).slice(-7);
+  state.lastReport={total,report:more,income:state.todayIn,expense:state.todayOut};
+  return {total,report:more,income:state.todayIn,expense:state.todayOut};
+}
+
+function monthEnd(){
+  let rent=0,salary=0,interest=0,bankInt=0,standFees=0,insure=0;
+  state.taxis.forEach(t=>{
+    if(!t.owned) rent+=t.rent||carById(t.modelId).rent;
+    if(t.insured){const fee=Math.round((carById(t.modelId).price)*0.008);insure+=fee}
+  });
+  state.drivers.forEach(d=>{if(d.hired) salary+=d.salary});
+  state.stands.forEach(st=>standFees+=standFee(st));
+  if(state.loan>0){interest=Math.round(state.loan*0.06);state.loan+=interest}
+  if(state.bank>0){bankInt=Math.round(state.bank*0.03);state.bank+=bankInt}
+  const out=rent+salary+interest+standFees+insure;
+  addCash(-out);
+  return {rent,salary,interest,bankInt,standFees,insure,out};
+}
+
+function newDay(fromSleep){
+  const dayRep=applyDayEnd();
+  state.todayIn=0; state.todayOut=0;
+  state.day++; state.stats.days=state.day;
+  let monthReport=null;
+  if((state.day-1)%30===0&&state.day>1){
+    state.month++; if(state.month>12){state.month=1;state.year++}
+    monthReport=monthEnd();
+  }
+  if(state.day>=state.eventUntil) rollEvent();
+  maybeWeekly(); makeDaily();
+  if(state.day%5===0) refreshMarketDrivers();
+  if(state.day%3===0) refreshPlates();
+  // raise prompts stored on drivers
+  checkQuests(); save();
+  return {dayRep,monthReport};
+}
+
+function startNewGame(name){
+  state=defaultState(name);
+  refreshMarketDrivers(); refreshPlates(); makeDaily(); rollEvent();
+  state.eventId=pick(["calm","rush"]);
+  view="durak"; selectedDistrict=state.currentStand; computeWaiting();
+  save(); showGame();
+}
+function continueGame(){
+  const s=load();
+  if(!s) return startNewGame($("#pname").value);
+  state=s;
+  if(!state.marketDrivers||!state.marketDrivers.length) refreshMarketDrivers();
+  if(!state.plateMarket||!state.plateMarket.length) refreshPlates();
+  if(!state.daily||!state.daily.length) makeDaily();
+  view="durak"; selectedDistrict=state.currentStand; computeWaiting();
+  showGame();
+}
+function showGame(){
+  $("#screen-start").classList.add("hidden");
+  $("#screen-game").classList.remove("hidden");
+  renderNav(); renderAll(); startLoop();
+}
+function startLoop(){if(tickTimer) clearInterval(tickTimer); tickTimer=setInterval(tick,TICK_MS)}
+function tick(){
+  if(!state||paused||ride) return;
+  state.minutes+=MINUTES_PER_TICK;
+  if(state.minutes>=1440){
+    state.minutes-=1440;
+    const rep=newDay(false);
+    updateHud();
+    if(rep.monthReport) openMonthModal(rep.monthReport,rep.dayRep);
+    else if(rep.dayRep&&rep.dayRep.total) toast("Şoförlerin bugün "+tl(rep.dayRep.total)+" kazandı");
+    // pending raises
+    const asking=state.drivers.find(d=>d._raise);
+    if(asking&&!rep.monthReport) openRaiseModal(asking);
+  }
+  if(state.minutes%10===0) computeWaiting();
+  updateHud();
+  if(view==="durak"){
+    const sky=$(".sky");
+    if(sky){const tod=todFromMinutes(state.minutes); if(!sky.classList.contains(tod)) sky.className="sky "+tod}
+    const badge=$("#wait-count"); if(badge) badge.textContent=waitingCount+" yolcu bekliyor";
+    const yb=$("#btn-yolcu"); if(yb) yb.disabled=waitingCount<=0||!playerTaxi();
+  }
+}
+function skipToMorning(){
+  paused=true;
+  if(state.minutes<7*60){state.minutes=7*60+30;paused=false;computeWaiting();renderAll();toast("Sabah 07:30. Durağa gelindi.");return}
+  state.minutes=7*60+30;
+  const rep=newDay(true);
+  paused=false; computeWaiting(); renderAll();
+  if(rep.monthReport) openMonthModal(rep.monthReport,rep.dayRep);
+  else openDayModal(rep.dayRep);
+  const asking=state.drivers.find(d=>d._raise);
+  // raise after closing day modal via later
+  state._pendingRaise=asking||null;
+}
+
+function pickPaxType(){
+  const ids=Object.keys(PAX_TYPES);
+  const weights=ids.map(id=>{
+    const t=PAX_TYPES[id];
+    let w=typeof t.weight==="function"?t.weight(state): (t.weight||1);
+    return Math.max(0,w);
+  });
+  const sum=weights.reduce((a,b)=>a+b,0)||1;
+  let r=Math.random()*sum;
+  for(let i=0;i<ids.length;i++){r-=weights[i]; if(r<=0) return PAX_TYPES[ids[i]]}
+  return PAX_TYPES.regular;
+}
+
+/* ===== RIDE ===== */
+function startRide(forceType){
+  const taxi=playerTaxi();
+  if(!taxi){toast("Bu durakta sürülebilir taksi yok (yakıt / durum / konum).");sfx("bad");return}
+  if(waitingCount<=0&&!forceType){toast("Şu an bekleyen yolcu yok.");return}
+  const type=forceType||pickPaxType();
+  const from=state.currentStand;
+  let dest=pick(DISTRICTS.filter(d=>d.id!==from)).id;
+  const ev=eventObj();
+  if(type.hospital){const hs=DISTRICTS.filter(d=>d.hospital&&d.id!==from); if(hs.length) dest=pick(hs).id}
+  if(type.airport||type.id==="vip"){dest=chance(.55)?"ist":"saw"}
+  if(type.id==="fan"&&ev.districts){const opts=ev.districts.filter(id=>id!==from); if(opts.length) dest=pick(opts)}
+  if(ev.districts&&Math.random()<.3&&!type.airport&&!type.hospital){const opts=ev.districts.filter(id=>id!==from); if(opts.length) dest=pick(opts)}
+  const km=distKm(from,dest);
+  const line=pick(type.lines);
+  ride={
+    taxiId:taxi.id, type,
+    pax:{name:paxName(type.id),ava:makeAva(type.id)},
+    from,dest,km, phase:"greet", line, greet:null, midAns:null,
+    mid:pick(MID_GENERIC), taps:[], tap:null, event:null, eventDone:false,
+    progress:0, fare:0, tip:0, rating:5, mood:type.mood||60,
+    last:performance.now(),
+    driveMs:clamp(7000+km*240,8000,16000)*(state.upgrades.gps?0.85:1)*(ev.slow||1),
+    scheduled:[], flags:{}
+  };
+  const nTaps=km>16?3:2;
+  for(let i=0;i<nTaps;i++) ride.scheduled.push({at:(i+1)/(nTaps+1)+rand(-0.04,0.04),ev:pick(TAP_EV)});
+  ride.eventAt=0.55+rand(-0.1,0.12);
+  waitingCount=Math.max(0,waitingCount-1);
+  paused=true; sfx("click"); $("#toast").classList.remove("show"); renderRide();
+}
+
+function renderRide(){
+  const el=$("#ride"); el.classList.remove("hidden");
+  if(!ride){el.classList.add("hidden");el.innerHTML="";return}
+  const taxi=taxiById(ride.taxiId), dest=destById(ride.dest), tod=todFromMinutes(state.minutes);
+  const skyBg={dawn:"linear-gradient(#f3a26a,#7ea0c8)",day:"linear-gradient(#5aa0e0,#9ec8f0)",dusk:"linear-gradient(#f08a4b,#4a3a6a)",night:"linear-gradient(#070b18,#1a2240)"}[tod];
+  const moving=ride.phase==="drive"||ride.phase==="tap"||ride.phase==="mid"||ride.phase==="event";
+  let ui="";
+  if(ride.phase==="greet"){
+    ui=`<div class="bubble"><b>${esc(ride.pax.name)}</b> <span class="pill pill-y">${esc(ride.type.label)}</span> bindi. “${esc(ride.line.q)}”</div>
+      <div class="choices">${ride.line.c.map((c,i)=>`<button data-act="greet" data-id="${i}">${esc(c.t)}</button>`).join("")}</div>`;
+  } else if(ride.phase==="mid"){
+    ui=`<div class="bubble">“${esc(ride.mid.q)}”</div>
+      <div class="choice-row">
+        <button data-act="mid" data-id="good">${esc(ride.mid.good)}</button>
+        <button data-act="mid" data-id="bad">${esc(ride.mid.bad)}</button>
+      </div>`;
+  } else if(ride.phase==="event"&&ride.event){
+    const ev=ride.event;
+    ui=`<div class="bubble"><b>${esc(ev.title)}</b><br>${esc(ev.text)}</div>
+      <div class="choices">${ev.c.map((c,i)=>`<button data-act="ride-ev" data-id="${i}">${esc(c.t)}</button>`).join("")}</div>`;
+  } else if(ride.phase==="tap"&&ride.tap){
+    ui=`<div class="tap-game"><div class="tg-title">${esc(ride.tap.ev.title)} — ${esc(ride.tap.ev.hint)}</div>
+      <div class="tap-track" id="tap-track"><div class="zone" style="left:${ride.tap.zone0}%;width:${ride.tap.zoneW}%"></div>
+      <div class="needle" id="tap-needle" style="left:0%"></div></div>
+      <button class="btn btn-y btn-block" style="margin-top:8px" data-act="tap-now">Dokun!</button></div>`;
+  } else if(ride.phase==="drive"){
+    ui=`<div class="bubble">📍 ${esc(dest.name)} yolundayız… Ruh hali: ${moodLabel(ride.mood)}</div>`;
+  } else if(ride.phase==="result"){
+    const stars="★★★★★☆☆☆☆☆".slice(5-ride.rating,10-ride.rating);
+    ui=`<div class="card">
+      <div class="spread"><h3 style="margin:0">Yolculuk bitti</h3><div class="stars-row">${stars}</div></div>
+      <div class="muted" style="margin-bottom:6px">${esc(ride.pax.name)} · ${esc(ride.type.label)} · ${esc(destById(ride.from).name)} → ${esc(dest.name)} · ${ride.km.toFixed(1)} km</div>
+      <div class="result-line"><span>Ücret</span><span>${tl(ride.fare)}</span></div>
+      <div class="result-line"><span>Bahşiş</span><span class="money">${tl(ride.tip)}</span></div>
+      <div class="result-line total"><span>Toplam</span><span class="money">${tl(ride.fare+ride.tip)}</span></div>
+      <button class="btn btn-y btn-block" style="margin-top:10px" data-act="ride-close">Durağa dön</button>
+    </div>`;
+  }
+  const moodPct=clamp(ride.mood,0,100);
+  const moodCls=moodPct<40?"bad":moodPct<65?"warn":"";
+  el.innerHTML=`
+    <div class="interior">
+      <div class="windshield">
+        <div class="ws-sky" style="background:${skyBg}"></div>
+        <div class="ws-city ${moving?"run":""}">${buildingHtml()}</div>
+        <div class="ws-road"><div class="ws-lane ${moving?"run":""}"></div></div>
+        <div class="mirror">${avaSvg(ride.pax.ava,32)}<small>AYNA</small></div>
+      </div>
+      <div class="dash">
+        <div class="wheel-shape"></div>
+        <div class="meter"><small>TAKSİMETRE</small><span id="ride-meter">${tl(ride.fare||0)}</span></div>
+        <div class="mood"><label>Ruh hali ${moodLabel(ride.mood)}</label><div class="bar ${moodCls}"><i id="mood-bar" style="width:${moodPct}%"></i></div></div>
+        <div class="pax-seat">
+          <div class="pax-ava">${avaSvg(ride.pax.ava,48)}</div>
+          <div><div class="pax-name">${esc(ride.pax.name)}</div><span class="pax-type">${esc(ride.type.label)}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="ride-ui">
+      <div class="ride-prog-wrap">
+        <span>${esc(destById(ride.from).name)}</span>
+        <div class="ride-prog"><i id="ride-bar" style="width:${ride.progress*100}%"></i></div>
+        <span>${esc(dest.name)}</span>
+      </div>
+      ${ui}
+    </div>`;
+  if(ride.phase==="tap") startTapAnim();
+  if(ride.phase==="drive") startDriveLoop();
+}
+function moodLabel(m){if(m>=80)return"😊";if(m>=60)return"🙂";if(m>=40)return"😐";if(m>=25)return"🙁";return"😠"}
+
+function applyChoice(ch){
+  if(!ch) return;
+  if(ch.mood) ride.mood=clamp(ride.mood+ch.mood,0,100);
+  if(ch.tip) ride.flags.tipMul=(ride.flags.tipMul||1)*(ch.tip);
+  if(ch.fare) ride.flags.fareMul=(ride.flags.fareMul||1)*ch.fare;
+  if(ch.it) ride.flags.it=(ride.flags.it||0)+ch.it;
+  if(ch.fast) ride.flags.fast=true;
+  if(ch.slow) ride.flags.slow=true;
+  if(ch.dest) {ride.dest=ch.dest; ride.km=distKm(ride.from,ride.dest)}
+  if(ch.destAir){if(!destById(ride.dest).airport) ride.dest=chance(.55)?"ist":"saw"; ride.km=distKm(ride.from,ride.dest)}
+  if(ch.cost){addCash(-ch.cost); toast("-"+tl(ch.cost))}
+  if(ch.delay) ride.driveMs+=ch.delay*1400;
+  if(ch.risk) ride.flags.risk=true;
+  if(ch.kind==="radar"&&chance(.45)){const fine=irand(600,1800); addCash(-fine); toast("Radar cezası "+tl(fine)); sfx("bad")}
+  if(ch.kind==="trust") ride.flags.trust=true;
+  if(ch.kick){ride.flags.kick=true}
+}
+function chooseGreet(i){
+  const ch=ride.line.c[+i]; ride.greet=ch; applyChoice(ch);
+  if(ch&&ch.kick){toast("Yolcu inmedi. Başka müşteri bekle."); closeRide(); return}
+  toast(ride.pax.name+": “"+destById(ride.dest).name+", lütfen.”");
+  ride.phase="drive"; ride.last=performance.now(); ride.midAt=0.38+rand(-0.05,0.08); ride.midShown=false;
+  sfx("click"); renderRide();
+}
+let driveRaf=0, tapRaf=0;
+function startDriveLoop(){
+  cancelAnimationFrame(driveRaf);
+  const loop=(now)=>{
+    if(!ride||ride.phase!=="drive") return;
+    const dt=now-ride.last; ride.last=now;
+    let speed=1/ride.driveMs;
+    if(ride.flags.fast) speed*=1.15;
+    if(ride.flags.slow) speed*=0.82;
+    ride.progress=clamp(ride.progress+dt*speed,0,1);
+    const ev=eventObj();
+    const night=todFromMinutes(state.minutes)==="night"?1.15:1;
+    const car=carById(taxiById(ride.taxiId).modelId);
+    let fare=(85+ride.km*18)*(ev.fare||1)*night*(.95+car.comfort*.03)*(ride.type.fare||1)*(ride.flags.fareMul||1);
+    if(state.upgrades.taksimetre) fare*=1.1;
+    ride.fare=Math.round(fare*Math.max(ride.progress,.15));
+    const bar=$("#ride-bar"); if(bar) bar.style.width=(ride.progress*100)+"%";
+    const meter=$("#ride-meter"); if(meter) meter.textContent=tl(ride.fare);
+    if(!ride.midShown&&ride.progress>=ride.midAt){ride.midShown=true;ride.phase="mid";$("#toast").classList.remove("show");renderRide();return}
+    if(!ride.eventDone&&ride.progress>=ride.eventAt){
+      ride.eventDone=true;
+      if(chance(0.62)||ride._forceEvent){
+        let pool=RIDE_EVENTS.slice();
+        if(eventObj().rain) pool=pool.concat([RIDE_EVENTS.find(e=>e.id==="rain")]);
+        ride.event=ride._forceEvent||pick(pool);
+        ride.phase="event"; $("#toast").classList.remove("show"); renderRide(); return;
+      }
+    }
+    const nxt=ride.scheduled.find(s=>!s.done&&ride.progress>=s.at);
+    if(nxt){nxt.done=true;beginTap(nxt.ev);return}
+    if(ride.progress>=1){finishRide();return}
+    driveRaf=requestAnimationFrame(loop);
+  };
+  driveRaf=requestAnimationFrame(loop);
+}
+function chooseMid(id){
+  ride.midAns=id; ride.mood+=id==="good"?8:-6; ride.mood=clamp(ride.mood,0,100);
+  ride.phase="drive"; ride.last=performance.now(); sfx("click"); renderRide();
+}
+function chooseRideEv(i){
+  const ch=ride.event.c[+i]; applyChoice(ch);
+  ride.phase="drive"; ride.last=performance.now(); sfx("click"); renderRide();
+}
+function beginTap(ev){
+  ride.phase="tap";
+  const zoneW=state.upgrades.gps?22:16;
+  const zone0=irand(30,70-zoneW);
+  ride.tap={ev,zone0,zoneW,pos:0,dir:1,speed:.09+Math.random()*.04,start:performance.now()};
+  sfx("tap"); renderRide();
+}
+function startTapAnim(){
+  cancelAnimationFrame(tapRaf);
+  const loop=(now)=>{
+    if(!ride||ride.phase!=="tap"||!ride.tap) return;
+    const t=ride.tap; t.pos+=t.speed*t.dir*1.6;
+    if(t.pos>=100){t.pos=100;t.dir=-1} if(t.pos<=0){t.pos=0;t.dir=1}
+    const n=$("#tap-needle"); if(n) n.style.left=t.pos+"%";
+    if(now-t.start>4000){resolveTap(false);return}
+    tapRaf=requestAnimationFrame(loop);
+  };
+  tapRaf=requestAnimationFrame(loop);
+}
+function resolveTap(){
+  if(!ride||ride.phase!=="tap"||!ride.tap) return;
+  const t=ride.tap, hit=t.pos>=t.zone0&&t.pos<=t.zone0+t.zoneW;
+  ride.taps.push(!!hit);
+  if(hit){sfx("ok");toast("Güzel refleks!");ride.mood=clamp(ride.mood+4,0,100)}
+  else{sfx("bad");toast("Kaçırdın…");ride.mood=clamp(ride.mood-8,0,100)}
+  ride.tap=null; ride.phase="drive"; ride.last=performance.now(); renderRide();
+}
+
+function finishRide(){
+  cancelAnimationFrame(driveRaf); cancelAnimationFrame(tapRaf);
+  const taxi=taxiById(ride.taxiId), car=carById(taxi.modelId), ev=eventObj();
+  const night=todFromMinutes(state.minutes)==="night"?1.15:1;
+  let fare=(85+ride.km*18)*(ev.fare||1)*night*(.95+car.comfort*.03)*(ride.type.fare||1)*(ride.flags.fareMul||1);
+  if(state.upgrades.taksimetre) fare*=1.1;
+  ride.fare=Math.round(fare);
+  if(ride.flags.trust){ /* maybe pay later */ if(chance(.7)){toast("Yolcu sonra ödeyecek… dürüstlük puanı."); ride.fare=Math.round(ride.fare*0.2)} else {toast("Güvenin boşa çıkmadı, hepsini bıraktı.")} }
+
+  let tipMul=(ride.flags.tipMul||1)*(ride.type.tip||1);
+  if(ride.midAns==="good") tipMul+=.15; if(ride.midAns==="bad") tipMul-=.12;
+  const hits=ride.taps.filter(Boolean).length, miss=ride.taps.length-hits;
+  tipMul+=hits*.1-miss*.12+(car.comfort-2)*.06;
+  if(state.upgrades.koltuk) tipMul*=1.15;
+  if(ev.tip) tipMul*=ev.tip;
+  if(ride.flags.fast&&ride.type.hurry) tipMul*=1.2;
+  if(ride.flags.slow&&ride.type.careful) tipMul*=1.2;
+  if(ride.flags.fast&&ride.type.careful) tipMul*=.8;
+  if(ride.flags.slow&&ride.type.hurry) tipMul*=.7;
+  tipMul*=0.7+ride.mood/200;
+  tipMul=clamp(tipMul,0,2.4);
+  ride.tip=Math.round(ride.fare*0.12*tipMul);
+
+  let rating=3.4+(ride.mood-50)/28+(ride.flags.it||0)*0.3+hits*.3-miss*.55+(taxi.condition-70)/90;
+  if(ride.type.strict) rating-=0.4;
+  if(state.upgrades.klima) rating+=0.2;
+  rating=clamp(Math.round(rating),1,5);
+  ride.rating=rating;
+
+  const gain=ride.fare+ride.tip;
+  addCash(gain); state.stats.tips+=ride.tip; state.stats.rides+=1;
+  if(rating>=5){state.stats.fiveStars++; grantAch("five_star")}
+  if(destById(ride.dest).airport){state.stats.airports++; grantAch("airport")}
+  const h=hour(state.minutes); if(h<5||h>=0&&h<5){state.stats.nights++; grantAch("night_owl")}
+  if(state.stats.rides===1) grantAch("first_ride");
+
+  taxi.rides+=1; taxi.earnings+=gain; taxi.km+=Math.round(ride.km);
+  const wear=(1.4+ride.km*.12+miss*.8)*(car.wear||1)*(ride.flags.risk?1.4:1);
+  taxi.condition=clamp(taxi.condition-wear,4,100);
+  const fuelUse=(4+ride.km*.35)*(car.fuel==="Dizel"?1.1:1)*(state.upgrades.yakitkart?0.7:1);
+  taxi.fuel=clamp(taxi.fuel-fuelUse,0,100);
+  if(ride.flags.risk&&chance(.2)&&!taxi.insured){
+    const dmg=irand(400,2000); addCash(-dmg); toast("Küçük hasar: -"+tl(dmg));
+  }
+
+  let minutesPass=Math.round(8+ride.km*1.1*(ev.slow||1)*(state.upgrades.gps?0.85:1)*(ride.flags.fast?0.85:1)*(ride.flags.slow?1.2:1));
+  state.minutes+=minutesPass;
+  if(state.minutes>=1440){state.minutes-=1440;newDay(false)}
+
+  const from=ride.from, dest=ride.dest;
+  const delta=(rating-3)*1.4+(ride.flags.it||0);
+  if(state.itibar[from]!=null) state.itibar[from]=clamp(state.itibar[from]+delta*.4,20,99);
+  if(state.itibar[dest]!=null) state.itibar[dest]=clamp(state.itibar[dest]+delta,20,99);
+
+  addXp(8+Math.round(ride.km/4)+(rating>=5?4:0)+(ride.type.id==="vip"?6:0));
+  checkDaily("ride"); checkDaily("earn",gain); checkDaily("dest",1,dest);
+  checkQuests(); save(); sfx("cash");
+  ride.phase="result"; renderRide();
+  // leftover item chance
+  if(chance(.16)&&ride.type.id!=="drunk"){
+    ride.leftItem={name:pick(["telefon","cüzdan","kulaklık","anahtar","şemsiye"]),pax:ride.pax.name};
+  }
+}
+function closeRide(){
+  const left=ride&&ride.leftItem;
+  ride=null; paused=false;
+  $("#ride").classList.add("hidden"); $("#ride").innerHTML="";
+  computeWaiting();
+  if(left){
+    openModal(`<h2>Unutulan eşya</h2>
+      <p class="muted">${esc(left.pax)} bir ${esc(left.name)} unuttu. Ne yaparsın?</p>
+      <div class="col" style="margin-top:10px">
+        <button class="btn btn-y btn-block" data-act="item-return" data-name="${esc(left.name)}">Teslim et (itibar + ödül)</button>
+        <button class="btn btn-d btn-block" data-act="item-keep">Sakla (nakit, itibar düşer)</button>
+      </div>`);
+    state._left=left;
+  }
+  renderAll();
+}
+function needStandFirst(){if(!state.stands.length){toast("Önce bir durak kurmalısın.");return true}return false}
+function buyCar(modelId,kind){
+  if(needStandFirst()) return;
+  const car=carById(modelId); if(!car) return;
+  if(state.level<car.level){toast("Seviye "+car.level+" gerekli.");return}
+  let price=0,owned=true,cond=100,rent=0;
+  if(kind==="yeni"){price=car.price;cond=100;owned=true}
+  else if(kind==="used"){price=car.used;cond=irand(55,82);owned=true}
+  else{price=0;cond=irand(86,96);owned=false;rent=car.rent}
+  if(owned&&state.cash<price){toast("Yeterli bakiyen yok.");sfx("bad");return}
+  if(!owned&&state.cash<car.rent){toast("İlk ay kirasını karşılayacak bakiyen yok.");sfx("bad");return}
+  if(owned) addCash(-price);
+  const used=new Set(state.taxis.map(t=>t.plate));
+  const t={id:uid("tx"),modelId,plate:plateGen(used),owned,condition:cond,fuel:owned&&kind==="yeni"?100:irand(50,90),
+    driverId:null,standId:state.currentStand,rides:0,earnings:0,buyPrice:owned?price:0,rent,
+    km:kind==="yeni"?0:irand(30000,140000),insured:false,lastServiceKm:0,plateOwned:false};
+  state.taxis.push(t);
+  if(!state.activeTaxiId) state.activeTaxiId=t.id;
+  checkQuests(); save(); sfx("cash");
+  toast(car.name+(owned?" filoya katıldı. Plaka ayrıca alınır.":" kiralandı. Aylık "+tl(rent)));
+  renderAll();
+}
+function sellTaxi(id){
+  const t=taxiById(id); if(!t) return;
+  if(!t.owned){
+    state.taxis=state.taxis.filter(x=>x.id!==id);
+    if(t.driverId){const d=driverById(t.driverId); if(d) d.taxiId=null}
+    if(state.activeTaxiId===id) state.activeTaxiId=state.taxis[0]?.id||null;
+    toast(t.plate+" iade edildi."); save(); renderAll(); return;
+  }
+  const val=Math.round(t.buyPrice*0.7)+(t.plateOwned?4000:0);
+  openModal(`<h2>Taksiyi sat</h2>
+    <p class="muted">${esc(carById(t.modelId).name)} · ${esc(t.plate)} alış bedelinin %70'i${t.plateOwned?" + plaka":""} ile satılır.</p>
+    <p style="margin:10px 0;font-size:18px;font-weight:800" class="money">${tl(val)}</p>
+    <div class="row"><button class="btn btn-g btn-block" data-act="close-modal">Vazgeç</button>
+    <button class="btn btn-d btn-block" data-act="confirm-sell" data-id="${t.id}">Sat</button></div>`);
+}
+function confirmSell(id){
+  const t=taxiById(id); if(!t||!t.owned) return;
+  if(state.taxis.length<=1){toast("Son taksini satamazsın.");closeModal();return}
+  const val=Math.round(t.buyPrice*0.7)+(t.plateOwned?4000:0);
+  addCash(val);
+  if(t.driverId){const d=driverById(t.driverId); if(d) d.taxiId=null}
+  state.taxis=state.taxis.filter(x=>x.id!==id);
+  if(state.activeTaxiId===id) state.activeTaxiId=state.taxis[0]?.id||null;
+  closeModal(); sfx("cash"); toast(t.plate+" "+tl(val)+" karşılığı satıldı."); save(); renderAll();
+}
+function takeWheel(id){
+  const t=taxiById(id); if(!t) return;
+  state.activeTaxiId=t.id;
+  if(t.standId!==state.currentStand){
+    const km=distKm(state.currentStand,t.standId);
+    state.minutes+=Math.round(10+km*1.2);
+    if(state.minutes>=1440){state.minutes-=1440;newDay(false)}
+    state.currentStand=t.standId; selectedDistrict=t.standId;
+    toast(distById(t.standId).name+" durağına geçtin. Direksiyon sende.");
+  } else toast("Direksiyon sende: "+t.plate);
+  sfx("click"); save(); renderAll();
+}
+function hireDriver(mid){
+  const m=state.marketDrivers.find(d=>d.id===mid); if(!m) return;
+  if(state.cash<m.salary*0.25){toast("İlk maaş avansı için bakiye yetersiz.");return}
+  const d={id:uid("dr"),name:m.name,skill:m.skill,salary:m.salary,hired:true,taxiId:null,
+    honesty:m.honesty||irand(2,5),fatigue:0,morale:70,traits:m.traits||[pick(TRAITS).id],trainLvl:0};
+  state.drivers.push(d); state.marketDrivers=state.marketDrivers.filter(x=>x.id!==mid);
+  addCash(-Math.round(m.salary*0.1));
+  checkQuests(); save(); sfx("ok"); toast(d.name+" işe alındı. Aylık "+tl(d.salary)); renderAll();
+}
+function fireDriver(id){
+  const d=driverById(id); if(!d) return;
+  if(d.taxiId){const t=taxiById(d.taxiId); if(t) t.driverId=null}
+  state.drivers=state.drivers.filter(x=>x.id!==id);
+  toast(d.name+" işten ayrıldı."); save(); renderAll();
+}
+function assignDriver(driverId,taxiId){
+  const d=driverById(driverId); if(!d) return;
+  if(d.taxiId){const old=taxiById(d.taxiId); if(old) old.driverId=null}
+  if(taxiId){
+    const t=taxiById(taxiId); if(!t) return;
+    if(t.driverId&&t.driverId!==d.id){const o=driverById(t.driverId); if(o) o.taxiId=null}
+    t.driverId=d.id; d.taxiId=t.id;
+  } else d.taxiId=null;
+  checkQuests(); save(); sfx("click"); renderAll();
+}
+function trainDriver(id){
+  const d=driverById(id); if(!d) return;
+  const cost=4000+d.trainLvl*2500;
+  if(d.skill>=5){toast("Zaten zirvede.");return}
+  if(state.cash<cost){toast("Eğitim için bakiye yetersiz.");return}
+  addCash(-cost); d.skill=clamp(d.skill+1,1,5); d.trainLvl++; d.morale=clamp(d.morale+10,0,100);
+  grantAch("train"); toast(d.name+" eğitim aldı. Beceri "+d.skill); sfx("ok"); save(); renderAll();
+}
+function restDriver(id){
+  const d=driverById(id); if(!d) return;
+  d.fatigue=clamp(d.fatigue-45,0,100); d.morale=clamp(d.morale+8,0,100);
+  toast(d.name+" dinlendirildi."); save(); renderAll();
+}
+function acceptRaise(id,yes){
+  const d=driverById(id); closeModal(); if(!d||!d._raise) return;
+  if(yes){d.salary+=d._raise; d.morale=clamp(d.morale+20,0,100); toast(d.name+" zam aldı: "+tl(d.salary));}
+  else {d.morale=clamp(d.morale-25,0,100); toast(d.name+" zam alamadı, morali bozuldu.")}
+  d._raise=0; save(); renderAll();
+}
+function buyStand(id){
+  const d=distById(id); if(!d) return;
+  if(ownedStand(id)){toast("Bu durak zaten senin.");return}
+  if(state.level<d.level){toast("Seviye "+d.level+" gerekli.");return}
+  if(state.cash<d.standCost){toast("Yeterli bakiyen yok.");sfx("bad");return}
+  addCash(-d.standCost); state.stands.push(makeStand(id,1));
+  checkQuests(); save(); sfx("cash"); toast(d.name+" durağını kurdun."); renderAll();
+}
+function upgradeStand(id){
+  const st=getStand(id); if(!st) return;
+  if(st.level>=3){toast("Durak en üst seviyede.");return}
+  const cost=standUpgradeCost(st);
+  if(state.cash<cost){toast("Yükseltme için bakiye yetersiz.");return}
+  addCash(-cost); st.level++; grantAch("upgrade_stand");
+  toast(distById(id).name+" durağı seviye "+st.level+" · kapasite "+standCap(st));
+  sfx("ok"); save(); renderAll();
+}
+function goStand(id){
+  if(!ownedStand(id)){toast("Bu durak senin değil.");return}
+  if(state.currentStand===id){toast("Zaten buradasın.");return}
+  const km=distKm(state.currentStand,id);
+  state.minutes+=Math.round(12+km*1.3);
+  if(state.minutes>=1440){state.minutes-=1440;newDay(false)}
+  state.currentStand=id; selectedDistrict=id;
+  const t=activeTaxi(); if(t&&!t.driverId) t.standId=id;
+  computeWaiting(); save(); toast(distById(id).name+" durağına geçtin."); view="durak"; renderAll();
+}
+function repairCost(t){const miss=100-t.condition,car=carById(t.modelId);let c=miss*(90+car.comfort*25);if(state.upgrades.atolye)c*=.75;return Math.round(c)}
+function fuelCost(t){const miss=100-t.fuel,car=carById(t.modelId);const per=car.fuel==="Dizel"?28:18;let c=miss*per;if(state.upgrades.yakitkart)c*=.7;return Math.round(c)}
+function serviceCost(t){return Math.round(1800+carById(t.modelId).comfort*400+(t.km-(t.lastServiceKm||0))/40)}
+function insureCost(t){return Math.round(carById(t.modelId).price*0.008)}
+function doRepair(id){const t=taxiById(id);if(!t)return;const c=repairCost(t);if(c<=0){toast("Araç zaten sapasağlam.");return}if(state.cash<c){toast("Tamir için bakiye yetersiz.");return}addCash(-c);t.condition=100;save();sfx("ok");toast(t.plate+" tamir edildi. "+tl(c));renderAll()}
+function doFuel(id){const t=taxiById(id);if(!t)return;const c=fuelCost(t);if(c<=0){toast("Depo zaten dolu.");return}if(state.cash<c){toast("Yakıt için bakiye yetersiz.");return}addCash(-c);t.fuel=100;save();sfx("ok");toast(t.plate+" yakıt doldu. "+tl(c));renderAll()}
+function doService(id){const t=taxiById(id);if(!t)return;const c=serviceCost(t);if(state.cash<c){toast("Bakım için bakiye yetersiz.");return}addCash(-c);t.lastServiceKm=t.km;t.condition=clamp(t.condition+8,0,100);toast(t.plate+" periyodik bakımdan geçti.");sfx("ok");save();renderAll()}
+function toggleInsure(id){
+  const t=taxiById(id); if(!t) return;
+  if(t.insured){t.insured=false;toast("Sigorta iptal.");}
+  else {const c=insureCost(t); if(state.cash<c){toast("İlk prim için bakiye yok.");return} addCash(-c); t.insured=true; grantAch("insure"); toast("Sigorta başladı. Aylık "+tl(c))}
+  save(); renderAll();
+}
+function buyPlate(pid, taxiId){
+  const pl=state.plateMarket.find(p=>p.id===pid); if(!pl) return;
+  const t=taxiById(taxiId||state.activeTaxiId||state.taxis[0]?.id); if(!t) return;
+  if(state.cash<pl.price){toast("Plaka için bakiye yetersiz.");return}
+  addCash(-pl.price); t.plate=pl.plate; t.plateOwned=true;
+  state.plateMarket=state.plateMarket.filter(p=>p.id!==pid);
+  toast(t.plate+" plakası bağlandı."); sfx("cash"); save(); renderAll();
+}
+function bankDeposit(n){n=Math.round(n);if(n<=0)return;if(state.cash<n){toast("Nakit yetersiz.");return}addCash(-n,"xfer");state.bank+=n;checkQuests();save();sfx("cash");toast(tl(n)+" yatırıldı.");renderAll()}
+function bankWithdraw(n){n=Math.round(n);if(n<=0)return;if(state.bank<n){toast("Hesapta yeterli bakiye yok.");return}state.bank-=n;addCash(n,"xfer");save();sfx("cash");toast(tl(n)+" çekildi.");renderAll()}
+function maxLoan(){return state.level*50000}
+function takeLoan(n){n=Math.round(n);if(n<=0)return;if(state.loan+n>maxLoan()){toast("Kredi limitin "+tl(maxLoan())+".");return}state.loan+=n;addCash(n,"xfer");save();sfx("cash");toast(tl(n)+" kredi çekildi. Aylık faiz %6.");renderAll()}
+function repayLoan(n){n=Math.round(Math.min(n,state.loan));if(n<=0)return;if(state.cash<n){toast("Nakit yetersiz.");return}addCash(-n,"xfer");state.loan-=n;save();sfx("ok");toast(tl(n)+" kredi ödemesi yapıldı.");renderAll()}
+function buyUpgrade(id){const u=SHOP.find(s=>s.id===id);if(!u)return;if(state.upgrades[id]){toast("Zaten satın alındı.");return}if(state.cash<u.price){toast("Yeterli bakiyen yok.");return}addCash(-u.price);state.upgrades[id]=1;save();sfx("cash");toast(u.name+" alındı.");renderAll()}
+function itemReturn(){closeModal();if(!state._left)return;addCash(irand(400,1200));const d=state.currentStand;state.itibar[d]=clamp((state.itibar[d]??60)+4,20,99);grantAch("return_item");toast("Eşya teslim edildi, itibar arttı.");state._left=null;save();renderAll()}
+function itemKeep(){closeModal();if(!state._left)return;addCash(irand(200,900));const d=state.currentStand;state.itibar[d]=clamp((state.itibar[d]??60)-6,20,99);toast("Eşyayı sakladın… itibar zedelendi.");state._left=null;save();renderAll()}
+
+/* ===== RENDER ===== */
+function updateHud(){
+  if(!state) return;
+  $("#hud-name").textContent=state.name;
+  const li=levelInfo(state.level);
+  $("#hud-level").textContent="Sv."+state.level+" "+li.name;
+  const rng=xpForLevel(state.level);
+  let pct=100; if(rng.next!=null) pct=clamp((state.xp-rng.cur)/(rng.next-rng.cur)*100,0,100);
+  $("#hud-xp").style.width=pct+"%";
+  const cash=$("#hud-cash"); cash.textContent=tl(state.cash); cash.classList.toggle("neg",state.cash<0);
+  $("#hud-day").textContent=state.day+". gün · "+state.month+". ay "+state.year;
+  $("#hud-clock").textContent=clockStr(state.minutes);
+  const ev=eventObj();
+  $("#hud-event").textContent=ev.name+" — "+ev.desc;
+}
+const NAV=[
+  {id:"garaj",label:"Garaj",path:"M4 20h16M6 20V8l6-4 6 4v12M10 20v-6h4v6"},
+  {id:"galeri",label:"Galeri",path:"M3 13l2-6h14l2 6M5 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm14 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM3 13h18v2H3z"},
+  {id:"durak",label:"Durak",path:"M4 17V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10M8 17v3M16 17v3M7 10h10M7 13h10"},
+  {id:"harita",label:"Harita",path:"M9 4l6 2 5-2v16l-5 2-6-2-5 2V6l5-2zM9 4v16M15 6v16"},
+  {id:"sofor",label:"Şoför",path:"M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zM4 20a8 8 0 0 1 16 0"},
+  {id:"banka",label:"Banka",path:"M3 10l9-7 9 7M5 10v8h14v-8M3 18h18M10 14h4"},
+  {id:"magaza",label:"Mağaza",path:"M4 9h16l-1 11H5L4 9zM9 9V6a3 3 0 0 1 6 0v3"}
+];
+function renderNav(){
+  $("#bottomnav").innerHTML=NAV.map(n=>`<button data-act="nav" data-id="${n.id}" class="${view===n.id?"on":""}">
+    <svg viewBox="0 0 24 24"><path d="${n.path}"/></svg>${n.label}</button>`).join("");
+}
+function condClass(n){return n<30?"bad":n<60?"warn":""}
+function renderAll(){
+  updateHud(); renderNav();
+  const root=$("#view");
+  if(view==="durak") root.innerHTML=renderDurak();
+  else if(view==="garaj") root.innerHTML=renderGaraj();
+  else if(view==="galeri") root.innerHTML=renderGaleri();
+  else if(view==="harita") root.innerHTML=renderHarita();
+  else if(view==="sofor") root.innerHTML=renderSofor();
+  else if(view==="banka") root.innerHTML=renderBanka();
+  else if(view==="magaza") root.innerHTML=renderMagaza();
+}
+
+function renderDurak(){
+  const tod=todFromMinutes(state.minutes), d=distById(state.currentStand), taxi=playerTaxi();
+  computeWaiting();
+  const q=QUESTS[state.questIndex], qn=Math.min(state.questIndex+1,QUESTS.length);
+  const figs=Array.from({length:clamp(waitingCount,0,5)},(_,i)=>{
+    const av=makeAva(pick(Object.keys(PAX_TYPES)));
+    return `<div>${figSvg(av,av.bag)}</div>`;
+  }).join("");
+  const daily=state.daily.map(t=>{
+    const ok=t.have>=t.need;
+    const pr=t.id==="d_earn"?tl(t.have)+"/"+tl(t.need):t.have+"/"+t.need;
+    return `<div class="daily-item ${ok?"done":""}"><span>${esc(t.title)}</span><span>${ok?"✓":pr}</span></div>`;
+  }).join("");
+  const disabled=!taxi||waitingCount<=0;
+  let why=waitingCount+" yolcu bekliyor";
+  if(!taxi){
+    if(!state.taxis.length) why="Önce taksi edin";
+    else if(!state.taxis.some(t=>t.standId===state.currentStand)) why="Bu durakta taksi yok";
+    else if(state.taxis.some(t=>t.standId===state.currentStand&&t.fuel<6)) why="Yakıt bitmiş";
+    else if(state.taxis.some(t=>t.standId===state.currentStand&&t.condition<8)) why="Araç tamire gitmeli";
+    else why="Sürülebilir taksi yok";
+  }
+  const st=getStand(state.currentStand);
+  const showMosque=d.mosque||d.water, showWater=d.water||d.side==="avrupa"&&["besiktas","sariyer","beyoglu","fatih"].includes(d.id);
+  return `<div id="view-durak">
+    <div class="street">
+      <div class="sky ${tod}"><div class="stars"></div><div class="celestial"></div>
+        <div class="cloud" style="top:18%;width:70px;left:8%;animation-duration:70s"></div>
+        <div class="cloud" style="top:28%;width:46px;left:40%;animation-duration:90s;animation-delay:-20s"></div>
+      </div>
+      <div class="skyline-far">${buildingHtml()}</div>
+      <div class="skyline-mid">${buildingHtml()}${showMosque?mosqueSvg():""}</div>
+      ${showWater?`<div class="water"><i style="top:20%"></i><i style="top:50%;animation-delay:1s"></i></div>`:""}
+      <div class="tree" style="left:72%"></div><div class="tree" style="left:86%;height:18%"></div>
+      <div class="stand-pole"></div><div class="stand-sign">TAKSİ<small>DURAĞI</small></div>
+      <div class="lamp" style="left:62%"><div class="glow"></div></div>
+      <div class="lamp" style="left:88%"><div class="glow"></div></div>
+      <div class="sidewalk"></div>
+      <div class="pax-wait" style="left:48%">${figs}</div>
+      <div class="taxi-park">${taxiSvg(taxi?taxi.modelId:"klia", taxi?taxi.plate:"34 TKS 17",{w:200,h:76,uid:"park"})}</div>
+      <div class="traffic">${trafficSvg()}</div>
+      <div class="traffic b">${trafficSvg(null,true)}</div>
+      <div class="street-road"><div class="lane"></div></div>
+      <div class="stand-chip">📍 ${esc(d.name)} · Lv.${st?st.level:1} · itibar %${Math.round(state.itibar[d.id]||0)}</div>
+    </div>
+    <div class="durak-dock">
+      <div class="quest-card">
+        <div class="q-kicker">Başlangıç ${qn}/8</div>
+        <div class="q-title">${q?esc(q.title):"Tüm görevler bitti!"}</div>
+        <div class="q-prog">${q?esc(q.hint):"Artık filonu büyüt."}</div>
+      </div>
+      <div class="daily-card"><div class="q-kicker">Günlük görevler</div>${daily}</div>
+      <div class="col" style="justify-content:stretch;gap:6px">
+        <button class="btn btn-y yolcu-btn" id="btn-yolcu" data-act="yolcu-al" ${disabled?"disabled":""}>
+          Yolcu al<small id="wait-count">${why}</small></button>
+        <button class="btn btn-g btn-xs" data-act="skip-day">Günü bitir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function chartSvg(hist){
+  const vals=(hist||[]).map(h=>h.income||0);
+  if(!vals.length) return `<div class="dim">Henüz 7 günlük veri yok. Günleri tamamla.</div>`;
+  const w=320,h=70,max=Math.max(...vals,1);
+  const pts=vals.map((v,i)=>{
+    const x=10+i*((w-20)/Math.max(vals.length-1,1));
+    const y=h-10-(v/max)*(h-20);
+    return x+","+y;
+  }).join(" ");
+  const slot=(w-24)/Math.max(vals.length,1);
+  const bw=Math.min(26,Math.max(8,slot-8));
+  const bars=vals.map((v,i)=>{
+    const x=12+i*slot+(slot-bw)/2;
+    const bh=(v/max)*(h-22);
+    return `<rect x="${x}" y="${h-10-bh}" width="${bw}" height="${bh}" rx="2" fill="#ffc400" opacity=".85"/>`;
+  }).join("");
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" width="100%" height="70">${bars}
+    <polyline points="${pts}" fill="none" stroke="#3ddc84" stroke-width="2"/></svg>`;
+}
+
+function renderGaraj(){
+  const tab=state.garajTab||"filo";
+  const tabs=`<div class="tabs">
+    <button class="${tab==="filo"?"on":""}" data-act="garaj-tab" data-id="filo">Filo</button>
+    <button class="${tab==="atolye"?"on":""}" data-act="garaj-tab" data-id="atolye">Atölye</button>
+    <button class="${tab==="rapor"?"on":""}" data-act="garaj-tab" data-id="rapor">Rapor</button>
+  </div>`;
+  if(tab==="rapor"){
+    const last=state.lastReport;
+    const lines=(last&&last.report||[]).map(r=>`<div class="result-line"><span>${esc(r)}</span></div>`).join("")||`<p class="muted">Henüz gün sonu raporu yok. Günü bitir.</p>`;
+    const per=state.taxis.map(t=>`<div class="result-line"><span>${esc(t.plate)} · ${esc(carById(t.modelId).name)}</span><span class="money">${tl(t.earnings)}</span></div>`).join("");
+    return `<div class="view-pad">${tabs}
+      <div class="stat-grid" style="margin-bottom:8px">
+        <div class="stat"><b class="money">${tl(last?last.income:state.todayIn)}</b><span>Son gün gelir</span></div>
+        <div class="stat"><b class="money out">${tl(last?last.expense:state.todayOut)}</b><span>Son gün gider</span></div>
+        <div class="stat"><b>${state.stats.rides}</b><span>Toplam yolcu</span></div>
+      </div>
+      <div class="card"><h3>Son 7 gün gelir</h3>${chartSvg(state.history)}</div>
+      <div class="card" style="margin-top:8px"><h3>Gün sonu notları</h3>${lines}</div>
+      <div class="card" style="margin-top:8px"><h3>Taksi başı kümülatif kazanç</h3>${per}</div>
+    </div>`;
+  }
+  if(tab==="atolye"){
+    const rows=state.taxis.map(t=>{
+      const car=carById(t.modelId), rc=repairCost(t), fc=fuelCost(t), sc=serviceCost(t), ic=insureCost(t);
+      const since=Math.round(t.km-(t.lastServiceKm||0));
+      return `<div class="card">
+        <div class="car-row">
+          <div class="car-thumb">${taxiSvg(t.modelId,t.plate,{w:120,h:48,uid:t.id})}</div>
+          <div>
+            <div class="spread"><b>${esc(car.name)}</b><span class="pill pill-y">${esc(t.plate)}</span></div>
+            <div class="dim">${esc(car.fuel)} · Durum %${Math.round(t.condition)} · Yakıt %${Math.round(t.fuel)} · ${Math.round(t.km)} km · bakım ${since} km önce</div>
+            <div class="bar ${condClass(t.condition)}" style="margin-top:4px"><i style="width:${t.condition}%"></i></div>
+            <div class="bar ${condClass(t.fuel)}" style="margin-top:3px"><i style="width:${t.fuel}%;background:var(--blue)"></i></div>
+          </div>
+          <div class="col">
+            <button class="btn btn-y btn-xs" data-act="repair" data-id="${t.id}">Tamir ${tl(rc)}</button>
+            <button class="btn btn-g btn-xs" data-act="fuel" data-id="${t.id}">Yakıt ${tl(fc)}</button>
+            <button class="btn btn-g btn-xs" data-act="service" data-id="${t.id}">Bakım ${tl(sc)}</button>
+            <button class="btn ${t.insured?"btn-ok":"btn-g"} btn-xs" data-act="insure" data-id="${t.id}">${t.insured?"Sigortalı":"Sigorta "+tl(ic)}</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div class="view-pad">${tabs}<div class="list">${rows||"<p class='muted'>Filonda taksi yok.</p>"}</div>
+      <p class="dim" style="margin-top:8px">Bakım yaptırmazsan arıza riski artar. Sigorta aylık prim keser, kazayı ucuzlatır. LPG, dizelden daha ucuz yakılır.</p></div>`;
+  }
+  const rows=state.taxis.map(t=>{
+    const car=carById(t.modelId), drv=t.driverId?driverById(t.driverId):null, st=distById(t.standId);
+    const badge=t.owned?`<span class="pill pill-g">SATIN ALINDI</span>`:`<span class="pill pill-o">KİRALIK</span>`;
+    const sellLbl=t.owned?"Sat (%70)":"İade et";
+    const driving=state.activeTaxiId===t.id;
+    return `<div class="card"><div class="car-row">
+      <div class="car-thumb">${taxiSvg(t.modelId,t.plate,{w:120,h:48,uid:"f"+t.id})}</div>
+      <div>
+        <div class="spread"><b>${esc(car.name)}</b>${badge}</div>
+        <div class="kv">
+          <span class="pill pill-y">${esc(t.plate)}${t.plateOwned?"":" · plakasız"}</span>
+          <span class="pill pill-b">${esc(st?.name||"-")}</span>
+          <span class="pill ${drv?"pill-g":"pill-r"}">${drv?esc(drv.name):"Şoför yok"}</span>
+          ${t.insured?`<span class="pill pill-p">SİGORTA</span>`:""}
+        </div>
+        <div class="dim" style="margin-top:4px">Yolculuk ${t.rides} · Kazanç ${tl(t.earnings)} · Durum %${Math.round(t.condition)} · ${Math.round(t.km)} km</div>
+        <div class="bar ${condClass(t.condition)}" style="margin-top:4px"><i style="width:${t.condition}%"></i></div>
+      </div>
+      <div class="col">
+        <button class="btn ${driving?"btn-ok":"btn-y"} btn-sm" data-act="wheel" data-id="${t.id}">${driving?"Direksiyondasın":"Direksiyona geç"}</button>
+        <button class="btn btn-d btn-sm" data-act="sell" data-id="${t.id}">${sellLbl}</button>
+      </div>
+    </div></div>`;
+  }).join("");
+  return `<div class="view-pad">${tabs}
+    <p class="dim" style="margin-bottom:8px">Pasif kazanç için şoför ata. Satın alınan araçlar %70'ine satılır. Durağın kapasitesini aşan filo verimsiz çalışır.</p>
+    <div class="list">${rows||"<p class='muted'>Galeriden taksi edin.</p>"}</div></div>`;
+}
+
+function renderGaleri(){
+  const tab=state.galeriTab||"yeni";
+  const tabs=`<div class="tabs">
+    <button class="${tab==="yeni"?"on":""}" data-act="galeri-tab" data-id="yeni">Sıfır</button>
+    <button class="${tab==="used"?"on":""}" data-act="galeri-tab" data-id="used">2. El</button>
+    <button class="${tab==="rent"?"on":""}" data-act="galeri-tab" data-id="rent">Kiralık</button>
+    <button class="${tab==="plaka"?"on":""}" data-act="galeri-tab" data-id="plaka">Plaka</button>
+  </div>`;
+  if(tab==="plaka"){
+    const opts=state.taxis.map(t=>`<option value="${t.id}">${esc(t.plate)} · ${esc(carById(t.modelId).name)}</option>`).join("");
+    const rows=(state.plateMarket||[]).map(p=>`<div class="card spread">
+      <div><b style="letter-spacing:.08em">${esc(p.plate)}</b><div class="dim">${p.fancy?"Özel / prestij plaka":"Standart plaka"}</div></div>
+      <div class="row">
+        <span class="money">${tl(p.price)}</span>
+        <select data-plate="${p.id}" class="plaka-sel" style="background:#0c1322;border:1px solid var(--line);border-radius:8px;padding:6px">${opts}</select>
+        <button class="btn btn-y btn-sm" data-act="buy-plate" data-id="${p.id}">Al</button>
+      </div>
+    </div>`).join("");
+    return `<div class="view-pad">${tabs}
+      <p class="dim" style="margin-bottom:8px">Her taksinin plakası bir varlık. Özel plakalar biraz prestij katar; satınca değerinin bir kısmı döner.</p>
+      <div class="list">${rows||"<p class='muted'>Bugün piyasada plaka yok. Yarın bak.</p>"}</div></div>`;
+  }
+  const rows=CARS.map(car=>{
+    const locked=state.level<car.level;
+    const price=tab==="yeni"?car.price:tab==="used"?car.used:car.rent;
+    const lbl=tab==="rent"?"Aylık kirala":"Satın al";
+    const stars="★".repeat(car.comfort)+"☆".repeat(5-car.comfort);
+    const shape={hatch:"Hatchback",sedan:"Sedan",van:"Ticari van",mpv:"MPV",premium:"Premium van"}[car.shape];
+    return `<div class="card car-row" style="${locked?"opacity:.55":""}">
+      <div class="car-thumb">${taxiSvg(car.id,"34 --- --",{w:120,h:48,uid:car.id+tab})}</div>
+      <div>
+        <div class="spread"><b>${esc(car.name)}</b><span class="pill ${car.fuel==="LPG"?"pill-y":"pill-b"}">${car.fuel}</span></div>
+        <div class="dim">${shape} · Konfor ${stars} · ${locked?"Sv."+car.level+" kilitli":"Sv."+car.level}</div>
+        ${tab==="used"?`<div class="dim">2. el durum ~%55–82, yüksek km</div>`:""}
+        <div style="margin-top:4px;font-weight:800" class="${tab==="rent"?"money out":"money"}">${tab==="rent"?tl(price)+"/ay":tl(price)}</div>
+      </div>
+      <div class="col">${locked?`<div class="lock-note">🔒 Sv.${car.level}</div>`:
+        `<button class="btn btn-y btn-sm" data-act="buy-car" data-id="${car.id}" data-kind="${tab}">${lbl}</button>`}</div>
+    </div>`;
+  }).join("");
+  return `<div class="view-pad">${tabs}
+    <p class="dim" style="margin-bottom:8px">Satın alınan araçlar %70’ine satılır. Plaka ayrıca alınır. Önce durak şart.</p>
+    <div class="list">${rows}</div></div>`;
+}
+
+function renderHarita(){
+  const sel=distById(selectedDistrict)||distById(state.currentStand);
+  const marks=DISTRICTS.map(d=>{
+    const owned=ownedStand(d.id), on=selectedDistrict===d.id, it=Math.round(state.itibar[d.id]||0);
+    return `<button class="mdist ${owned?"owned":""} ${on?"on":""}" style="left:${d.x}%;top:${d.y}%" data-act="sel-dist" data-id="${d.id}">
+      ${esc(d.name)}<div class="it">itibar %${it}</div></button>`;
+  }).join("");
+  const owned=ownedStand(sel.id), locked=state.level<sel.level, st=getStand(sel.id);
+  const evHere=(eventObj().districts||[]).includes(sel.id);
+  const weekHere=state.weekly&&state.weekly.district===sel.id;
+  const rival=state.rivals[sel.id];
+  let actions="";
+  if(owned){
+    actions=(state.currentStand===sel.id?`<button class="btn btn-ok btn-block" disabled>Şu an buradasın</button>`:
+      `<button class="btn btn-y btn-block" data-act="go-stand" data-id="${sel.id}">Durağıma geç</button>`);
+    if(st&&st.level<3) actions+=`<button class="btn btn-g btn-block" style="margin-top:6px" data-act="up-stand" data-id="${sel.id}">Durağı yükselt (Sv.${st.level+1}) · ${tl(standUpgradeCost(st))}</button>`;
+  } else if(locked) actions=`<div class="lock-note">Durak kurmak için seviye ${sel.level} gerekir.</div>`;
+  else actions=`<button class="btn btn-y btn-block" data-act="buy-stand" data-id="${sel.id}">Durak kur · ${tl(sel.standCost)}</button>`;
+  return `<div class="map-layout">
+    <div class="map-board"><div class="bosphorus"></div><div class="bridge" style="top:22%"></div><div class="bridge" style="top:48%"></div>${marks}</div>
+    <div class="map-info">
+      <div class="card">
+        <div class="side-tag">${sel.side==="avrupa"?"Avrupa Yakası":"Anadolu Yakası"}</div>
+        <h3 style="margin-top:4px;font-size:16px;text-transform:none;letter-spacing:0;color:var(--text)">${esc(sel.name)}</h3>
+        <div class="kv" style="margin:8px 0">
+          <span class="pill pill-g">İtibar %${Math.round(state.itibar[sel.id]||0)}</span>
+          <span class="pill pill-b">Yoğunluk ${sel.density}/4</span>
+          <span class="pill pill-y">Prestij ${sel.prestige}/5</span>
+          ${owned?`<span class="pill pill-g">DURAK Lv.${st.level} · kap. ${standCap(st)}</span>`:""}
+        </div>
+        <div class="bar" style="margin-bottom:8px"><i style="width:${state.itibar[sel.id]||0}%"></i></div>
+        ${owned?`<div class="dim" style="margin-bottom:8px">Aylık durak aidatı ${tl(standFee(st))} · Bu durakta ${taxisAt(sel.id).length} taksi</div>`:`<div class="dim" style="margin-bottom:8px">Durak bedeli ${tl(sel.standCost)}</div>`}
+        ${rival?`<p class="muted">⚔️ Rakip: ${esc(rival.name)} (güç ${rival.power}/3) talebi kesiyor.</p>`:""}
+        ${evHere?`<p class="muted">📢 Bugünkü olay bu semti etkiliyor.</p>`:""}
+        ${weekHere?`<p class="muted">⭐ ${esc(state.weekly.name)}</p>`:""}
+        ${actions}
+      </div>
+      <div class="card"><h3>Haftalık olay</h3><p>${esc(state.weekly?state.weekly.name:"Bu hafta sakin.")}</p>
+        <p class="dim" style="margin-top:4px">Yeşil kenarlı semtler durakların. Kapasiteyi aşan filo verimsizleşir.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function skillStars(n){return "★".repeat(n)+"☆".repeat(5-n)}
+function renderSofor(){
+  const hired=state.drivers.map(d=>{
+    const t=d.taxiId?taxiById(d.taxiId):null;
+    const opts=[`<option value="">— Taksi seç —</option>`].concat(
+      state.taxis.map(tx=>`<option value="${tx.id}" ${d.taxiId===tx.id?"selected":""}>${esc(tx.plate)} · ${esc(carById(tx.modelId).name)}</option>`)
+    ).join("");
+    const tr=(d.traits||[]).map(id=>{const x=TRAITS.find(z=>z.id===id);return x?x.name:id}).join(", ");
+    const cost=4000+d.trainLvl*2500;
+    return `<div class="card">
+      <div class="row">
+        <div class="driver-ava">${avaSvg(makeAva("regular"),40)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="spread"><b>${esc(d.name)}</b><span class="pill pill-o">${tl(d.salary)}/ay</span></div>
+          <div class="dim">Beceri ${skillStars(d.skill)} · Dürüstlük ${d.honesty||3}/5 · ${esc(tr)}</div>
+          <div class="dim">Yorgunluk %${Math.round(d.fatigue||0)} · Moral %${Math.round(d.morale||70)} · ${t?t.plate:"Atanmamış"}</div>
+          <div class="bar ${condClass(100-(d.fatigue||0))}" style="margin-top:4px"><i style="width:${100-(d.fatigue||0)}%"></i></div>
+        </div>
+        <div class="col">
+          <button class="btn btn-g btn-xs" data-act="train" data-id="${d.id}">Eğit ${tl(cost)}</button>
+          <button class="btn btn-g btn-xs" data-act="rest" data-id="${d.id}">Dinlendir</button>
+          <button class="btn btn-d btn-xs" data-act="fire" data-id="${d.id}">Çıkar</button>
+        </div>
+      </div>
+      <select data-act="assign" data-id="${d.id}" style="margin-top:8px;width:100%;background:#0c1322;border:1px solid var(--line);border-radius:8px;padding:8px">${opts}</select>
+    </div>`;
+  }).join("");
+  const market=state.marketDrivers.map(d=>{
+    const tr=(d.traits||[]).map(id=>{const x=TRAITS.find(z=>z.id===id);return x?x.name:id}).join(", ");
+    return `<div class="card row">
+      <div class="driver-ava">${avaSvg(makeAva("regular"),40)}</div>
+      <div style="flex:1">
+        <div class="spread"><b>${esc(d.name)}</b><span class="pill pill-o">${tl(d.salary)}/ay</span></div>
+        <div class="dim">Beceri ${skillStars(d.skill)} · ${esc(tr)} · dürüstlük ${d.honesty||3}/5</div>
+      </div>
+      <button class="btn btn-y btn-sm" data-act="hire" data-id="${d.id}">İşe al</button>
+    </div>`;
+  }).join("");
+  return `<div class="view-pad">
+    <div class="spread" style="margin-bottom:8px"><h3 style="margin:0">Filo şoförleri</h3><span class="dim">Yorgunluk ve moral kazancı etkiler</span></div>
+    <div class="list">${hired||"<p class='muted'>Henüz şoförün yok.</p>"}</div>
+    <h3 style="margin:12px 0 8px">İş arayanlar</h3>
+    <div class="list">${market||"<p class='muted'>Şu an aday yok. Birkaç güne bak.</p>"}</div>
+  </div>`;
+}
+
+function renderBanka(){
+  return `<div class="view-pad">
+    <div class="stat-grid" style="margin-bottom:10px">
+      <div class="stat"><b class="${state.cash<0?"money out":"money"}">${tl(state.cash)}</b><span>Nakit</span></div>
+      <div class="stat"><b class="money">${tl(state.bank)}</b><span>Mevduat (%3/ay)</span></div>
+      <div class="stat"><b class="money out">${tl(state.loan)}</b><span>Kredi (%6/ay)</span></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3>Mevduat</h3><p class="dim" style="margin-bottom:8px">Her ay başında %3 faiz işler.</p>
+        <div class="row">
+          <button class="btn btn-y btn-sm btn-block" data-act="bank-in" data-n="5000">Yatır 5.000 TL</button>
+          <button class="btn btn-y btn-sm btn-block" data-act="bank-in" data-n="10000">Yatır 10.000 TL</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn btn-g btn-sm btn-block" data-act="bank-out" data-n="5000">Çek 5.000 TL</button>
+          <button class="btn btn-g btn-sm btn-block" data-act="bank-out" data-n="10000">Çek 10.000 TL</button>
+        </div>
+        <button class="btn btn-g btn-sm btn-block" style="margin-top:6px" data-act="bank-in-all">Tüm nakdi yatır</button>
+      </div>
+      <div class="card"><h3>Kredi</h3>
+        <p class="dim" style="margin-bottom:8px">Limit ${tl(maxLoan())} (seviye × 50.000 TL). Aylık faiz %6.</p>
+        <div class="row">
+          <button class="btn btn-y btn-sm btn-block" data-act="loan-take" data-n="10000">Çek 10.000 TL</button>
+          <button class="btn btn-y btn-sm btn-block" data-act="loan-take" data-n="25000">Çek 25.000 TL</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn btn-g btn-sm btn-block" data-act="loan-pay" data-n="10000">Öde 10.000 TL</button>
+          <button class="btn btn-g btn-sm btn-block" data-act="loan-pay-all">Tümünü kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderMagaza(){
+  const rows=SHOP.map(u=>{
+    const has=!!state.upgrades[u.id];
+    return `<div class="card spread"><div><b>${esc(u.name)}</b><div class="dim">${esc(u.desc)}</div></div>
+      ${has?`<span class="pill pill-g">ALINDI</span>`:`<button class="btn btn-y btn-sm" data-act="buy-up" data-id="${u.id}">${tl(u.price)}</button>`}
+    </div>`;
+  }).join("");
+  return `<div class="view-pad"><p class="dim" style="margin-bottom:8px">Yükseltmeler tüm filoya uygulanır.</p><div class="list">${rows}</div></div>`;
+}
+
+function openModal(html){const m=$("#modal");m.innerHTML=`<div class="box">${html}</div>`;m.classList.remove("hidden");paused=true}
+function closeModal(){$("#modal").classList.add("hidden");$("#modal").innerHTML="";if(!ride) paused=false}
+function openSettings(){
+  openModal(`<h2>Ayarlar</h2>
+    <p class="muted" style="margin-bottom:10px">Kayıt bu tarayıcıda saklanır. v1 kayıtların otomatik taşınır.</p>
+    <div class="col">
+      <button class="btn btn-g btn-block" data-act="toggle-sound">Ses: ${state.sound?"Açık":"Kapalı"}</button>
+      <button class="btn btn-g btn-block" data-act="rename">Adı değiştir</button>
+      <button class="btn btn-g btn-block" data-act="open-ach">Rozetler</button>
+      <button class="btn btn-d btn-block" data-act="confirm-reset">Oyunu sıfırla</button>
+      <button class="btn btn-y btn-block" data-act="close-modal">Kapat</button>
+    </div>`);
+}
+function openAch(){
+  const items=ACHIEVEMENTS.map(a=>{
+    const on=state.achievements.includes(a.id)||(a.check&&a.check(state));
+    if(on&&!state.achievements.includes(a.id)) state.achievements.push(a.id);
+    return `<div class="badge ${on?"on":""}"><span class="ic">${a.ic}</span>${esc(a.name)}<div class="dim">${esc(a.desc)}</div></div>`;
+  }).join("");
+  openModal(`<h2>Rozetler</h2><div class="badge-grid">${items}</div>
+    <button class="btn btn-y btn-block" style="margin-top:12px" data-act="close-modal">Kapat</button>`);
+}
+function openDayModal(rep){
+  const lines=(rep&&rep.report&&rep.report.length)?rep.report.map(r=>`<div class="result-line"><span>${esc(r)}</span></div>`).join(""):
+    `<p class="muted">Bugün pasif kazanç yok. Şoför ata, akşamı bekle.</p>`;
+  openModal(`<h2>Gün bitti</h2>
+    <p class="muted" style="margin-bottom:8px">${state.day}. gün sabahı · ${clockStr(state.minutes)}</p>
+    ${lines}
+    <div class="result-line"><span>Gelir</span><span class="money">${tl(rep?rep.income:0)}</span></div>
+    <div class="result-line"><span>Gider</span><span class="money out">${tl(rep?rep.expense:0)}</span></div>
+    <div class="result-line total"><span>Net</span><span class="${(rep?(rep.income-rep.expense):0)<0?"money out":"money"}">${tl(rep?(rep.income-rep.expense):0)}</span></div>
+    <button class="btn btn-y btn-block" style="margin-top:10px" data-act="close-day">Sabaha devam</button>`);
+}
+function openMonthModal(m,dayRep){
+  openModal(`<h2>Ay sonu hesabı</h2><p class="muted">${state.month}. ay başladı</p>
+    <div class="result-line"><span>Kira gideri</span><span class="money out">-${tl(m.rent)}</span></div>
+    <div class="result-line"><span>Şoför maaşları</span><span class="money out">-${tl(m.salary)}</span></div>
+    <div class="result-line"><span>Durak aidatları</span><span class="money out">-${tl(m.standFees)}</span></div>
+    <div class="result-line"><span>Sigorta primleri</span><span class="money out">-${tl(m.insure)}</span></div>
+    <div class="result-line"><span>Kredi faizi</span><span class="money out">-${tl(m.interest)}</span></div>
+    <div class="result-line"><span>Mevduat faizi</span><span class="money">+${tl(m.bankInt)}</span></div>
+    ${dayRep&&dayRep.total?`<div class="result-line"><span>Şoför kazancı</span><span class="money">+${tl(dayRep.total)}</span></div>`:""}
+    <div class="result-line total"><span>Nakit</span><span class="${state.cash<0?"money out":"money"}">${tl(state.cash)}</span></div>
+    <button class="btn btn-y btn-block" style="margin-top:10px" data-act="close-modal">Tamam</button>`);
+}
+function openRaiseModal(d){
+  openModal(`<h2>Zam talebi</h2>
+    <p>${esc(d.name)} maaş artışı istiyor: <b>${tl(d.salary)}</b> → <b>${tl(d.salary+d._raise)}</b>.</p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn btn-g btn-block" data-act="raise-no" data-id="${d.id}">Reddet</button>
+      <button class="btn btn-y btn-block" data-act="raise-yes" data-id="${d.id}">Kabul et</button>
+    </div>`);
+}
+
+function initStartArt(){
+  const el=$("#start-art"); if(!el) return;
+  el.innerHTML=`<div style="position:absolute;left:0;right:0;bottom:58px;height:80%;">
+    ${buildingHtml()}${mosqueSvg()}
+    <div style="position:absolute;left:6%;bottom:0;z-index:3">${taxiSvg("klia","34 TKS 17",{w:180,h:70,uid:"s1"})}</div>
+    <div style="position:absolute;left:36%;bottom:0;z-index:3">${taxiSvg("vita","34 VIP 07",{w:200,h:74,uid:"s2"})}</div>
+    <div style="position:absolute;left:68%;bottom:0;z-index:3">${taxiSvg("dobla","34 DBL 22",{w:190,h:72,uid:"s3"})}</div>
+  </div>`;
+}
+
+function onClick(e){
+  const btn=e.target.closest("[data-act]"); if(!btn) return;
+  const act=btn.getAttribute("data-act"), id=btn.getAttribute("data-id"), kind=btn.getAttribute("data-kind"), n=Number(btn.getAttribute("data-n")||0);
+  if(act!=="tap-now") sfx("click");
+  if(act==="new-game"){
+    if(load()){openModal(`<h2>Yeni oyun?</h2><p class="muted">Kayıtlı ilerlemen silinir.</p>
+      <div class="row" style="margin-top:10px"><button class="btn btn-g btn-block" data-act="close-modal">Vazgeç</button>
+      <button class="btn btn-d btn-block" data-act="force-new">Sil ve başla</button></div>`);return}
+    startNewGame($("#pname").value.trim()||"İzzet");
+  } else if(act==="force-new"){closeModal();wipeSave();startNewGame($("#pname").value.trim()||"İzzet")}
+  else if(act==="continue") continueGame();
+  else if(act==="wipe-from-start") openModal(`<h2>Kayıt silinsin mi?</h2><div class="row" style="margin-top:10px"><button class="btn btn-g btn-block" data-act="close-modal">Vazgeç</button><button class="btn btn-d btn-block" data-act="wipe-yes">Sil</button></div>`);
+  else if(act==="wipe-yes"){wipeSave();closeModal();$("#btn-continue").classList.add("hidden");$("#btn-wipe").classList.add("hidden");toast("Kayıt silindi.")}
+  else if(act==="nav"){view=id;renderAll()}
+  else if(act==="yolcu-al") startRide();
+  else if(act==="skip-day") skipToMorning();
+  else if(act==="greet") chooseGreet(id);
+  else if(act==="mid") chooseMid(id);
+  else if(act==="ride-ev") chooseRideEv(id);
+  else if(act==="tap-now") resolveTap();
+  else if(act==="ride-close") closeRide();
+  else if(act==="garaj-tab"){state.garajTab=id;renderAll()}
+  else if(act==="galeri-tab"){state.galeriTab=id;renderAll()}
+  else if(act==="buy-car") buyCar(id,kind);
+  else if(act==="sell") sellTaxi(id);
+  else if(act==="confirm-sell") confirmSell(id);
+  else if(act==="wheel") takeWheel(id);
+  else if(act==="repair") doRepair(id);
+  else if(act==="fuel") doFuel(id);
+  else if(act==="service") doService(id);
+  else if(act==="insure") toggleInsure(id);
+  else if(act==="hire") hireDriver(id);
+  else if(act==="fire") fireDriver(id);
+  else if(act==="train") trainDriver(id);
+  else if(act==="rest") restDriver(id);
+  else if(act==="sel-dist"){selectedDistrict=id;renderAll()}
+  else if(act==="buy-stand") buyStand(id);
+  else if(act==="up-stand") upgradeStand(id);
+  else if(act==="go-stand") goStand(id);
+  else if(act==="bank-in") bankDeposit(n);
+  else if(act==="bank-in-all"){if(state.cash>0) bankDeposit(state.cash)}
+  else if(act==="bank-out") bankWithdraw(n);
+  else if(act==="loan-take") takeLoan(n);
+  else if(act==="loan-pay") repayLoan(n);
+  else if(act==="loan-pay-all") repayLoan(state.loan);
+  else if(act==="buy-up") buyUpgrade(id);
+  else if(act==="buy-plate"){
+    const sel=btn.parentElement.querySelector("select");
+    buyPlate(id, sel?sel.value:null);
+  } else if(act==="open-settings") openSettings();
+  else if(act==="open-ach") openAch();
+  else if(act==="close-modal") closeModal();
+  else if(act==="close-day"){
+    closeModal();
+    if(state._pendingRaise){const d=state._pendingRaise;state._pendingRaise=null;openRaiseModal(d)}
+  } else if(act==="raise-yes") acceptRaise(id,true);
+  else if(act==="raise-no") acceptRaise(id,false);
+  else if(act==="item-return") itemReturn();
+  else if(act==="item-keep") itemKeep();
+  else if(act==="toggle-sound"){state.sound=!state.sound;save();openSettings()}
+  else if(act==="rename") openModal(`<h2>Adını değiştir</h2>
+    <input id="rename-in" maxlength="18" value="${esc(state.name)}" style="width:100%;background:#0c1322;border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0">
+    <div class="row"><button class="btn btn-g btn-block" data-act="open-settings">Geri</button>
+    <button class="btn btn-y btn-block" data-act="rename-ok">Kaydet</button></div>`);
+  else if(act==="rename-ok"){const v=($("#rename-in")?.value||"").trim().slice(0,18);if(v){state.name=v;save()}closeModal();renderAll()}
+  else if(act==="confirm-reset") openModal(`<h2>Emin misin?</h2><p class="muted">Tüm ilerleme silinir.</p>
+    <div class="row" style="margin-top:10px"><button class="btn btn-g btn-block" data-act="open-settings">Vazgeç</button>
+    <button class="btn btn-d btn-block" data-act="do-reset">Sıfırla</button></div>`);
+  else if(act==="do-reset"){
+    closeModal(); wipeSave(); if(tickTimer) clearInterval(tickTimer); state=null;
+    $("#screen-game").classList.add("hidden"); $("#screen-start").classList.remove("hidden");
+    $("#btn-continue").classList.add("hidden"); $("#btn-wipe").classList.add("hidden"); toast("Oyun sıfırlandı.");
+  }
+}
+function onChange(e){
+  const el=e.target.closest("[data-act]"); if(!el) return;
+  if(el.getAttribute("data-act")==="assign") assignDriver(el.getAttribute("data-id"), el.value||null);
+}
+function boot(){
+  initStartArt();
+  const saved=load();
+  if(saved){$("#pname").value=saved.name||"İzzet";$("#btn-continue").classList.remove("hidden");$("#btn-wipe").classList.remove("hidden")}
+  document.addEventListener("click",onClick);
+  document.addEventListener("change",onChange);
+  document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&!$("#modal").classList.contains("hidden")) closeModal()});
+}
+window.__TAKSI__={
+  getState:()=>state,
+  setState:(p)=>{Object.assign(state,p);save();renderAll()},
+  startNewGame,continueGame,startRide,closeRide,skipToMorning,
+  buyCar,buyStand,upgradeStand,hireDriver,assignDriver,takeWheel,trainDriver,
+  bankDeposit,takeLoan,buyUpgrade,doRepair,doFuel,doService,toggleInsure,
+  goView:(v)=>{view=v;renderAll()},
+  getRide:()=>ride,
+  speedRide:()=>{if(ride) ride.driveMs=800},
+  forceNight:()=>{state.minutes=21*60+30;renderAll()},
+  forceEvent:(id)=>{if(ride){ride._forceEvent=RIDE_EVENTS.find(e=>e.id===id)||RIDE_EVENTS[0];ride.eventAt=0.05}},
+  startTypedRide:(type)=>startRide(PAX_TYPES[type]||PAX_TYPES.tourist),
+  tl,QUESTS,CARS,DISTRICTS,PAX_TYPES,RIDE_EVENTS,ACHIEVEMENTS
+};
+boot();
+</script>
+</body>
+</html>
